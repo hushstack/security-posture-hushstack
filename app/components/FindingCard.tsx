@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import type { SecurityFinding, FindingSeverity } from '@/app/types/scan';
 import { motion } from 'motion/react';
 
@@ -40,6 +41,9 @@ const categoryLabels: Record<string, string> = {
   dns: 'DNS Records',
   ssl: 'SSL/TLS',
   general: 'General',
+  performance: 'Performance',
+  pentest: 'Pentest',
+  vulnerability: 'Vulnerability',
 };
 
 function CheckIcon({ severity }: { severity: FindingSeverity }) {
@@ -64,7 +68,7 @@ function CheckIcon({ severity }: { severity: FindingSeverity }) {
   );
 }
 
-export function FindingCard({ finding }: FindingCardProps) {
+export const FindingCard = memo(function FindingCard({ finding }: FindingCardProps) {
   const styles = severityStyles[finding.severity];
 
   return (
@@ -86,7 +90,7 @@ export function FindingCard({ finding }: FindingCardProps) {
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-medium text-zinc-100">{finding.title}</h3>
             <span className="rounded-full px-2 py-0.5 text-xs font-medium bg-zinc-950/50 text-zinc-400 border border-zinc-800">
-              {categoryLabels[finding.category]}
+              {categoryLabels[finding.category] || finding.category}
             </span>
           </div>
           <p className="mt-1 text-sm text-zinc-400 leading-relaxed">{finding.description}</p>
@@ -103,4 +107,4 @@ export function FindingCard({ finding }: FindingCardProps) {
       </div>
     </motion.div>
   );
-}
+});

@@ -1,13 +1,21 @@
+/**
+ * Core types for all scanners
+ * Centralized type definitions for maintainability
+ */
+
 export type ScanMode = 'security' | 'performance' | 'pentest';
+
 export type SecurityGrade = 'A' | 'B' | 'C' | 'D' | 'F';
 export type PerformanceGrade = 'A' | 'B' | 'C' | 'D' | 'F';
 export type PentestGrade = 'SECURE' | 'VULNERABLE' | 'CRITICAL';
+export type Grade = SecurityGrade | PerformanceGrade | PentestGrade;
 
 export type FindingSeverity = 'good' | 'warning' | 'bad' | 'critical' | 'info';
+export type FindingCategory = 'headers' | 'dns' | 'ssl' | 'general' | 'performance' | 'pentest' | 'vulnerability';
 
 export interface SecurityFinding {
   id: string;
-  category: 'headers' | 'dns' | 'ssl' | 'general' | 'performance' | 'pentest' | 'vulnerability';
+  category: FindingCategory;
   title: string;
   description: string;
   severity: FindingSeverity;
@@ -15,10 +23,62 @@ export interface SecurityFinding {
   recommendation?: string;
 }
 
-// Performance specific types
+// SSL/TLS Types
+export interface SSLInfo {
+  valid: boolean;
+  expired: boolean;
+  daysUntilExpiry: number;
+  issuer: string;
+  subject: string;
+  validFrom: string;
+  validTo: string;
+  cipherSuites?: string[];
+  tlsVersion?: string;
+  weakCipher?: boolean;
+}
+
+// DNS Types
+export interface DNSRecords {
+  spf: {
+    present: boolean;
+    records: string[];
+  };
+  dmarc: {
+    present: boolean;
+    records: string[];
+    policy?: string;
+  };
+  mx: {
+    present: boolean;
+    records: string[];
+  };
+  txt: string[];
+  ns: string[];
+  a: string[];
+}
+
+// HTTP Headers Types
+export interface HeadersInfo {
+  strictTransportSecurity?: string;
+  contentSecurityPolicy?: string;
+  xFrameOptions?: string;
+  xContentTypeOptions?: string;
+  xXssProtection?: string;
+  referrerPolicy?: string;
+  permissionsPolicy?: string;
+  cacheControl?: string;
+  etag?: string;
+  lastModified?: string;
+  server?: string;
+  xPoweredBy?: string;
+  via?: string;
+  allHeaders: Record<string, string>;
+}
+
+// Performance Types
 export interface PerformanceMetrics {
   responseTime: number;
-  ttfb: number; // Time to first byte
+  ttfb: number;
   totalLoadTime: number;
   pageSize: number;
   resourceCount: number;
@@ -37,7 +97,7 @@ export interface PerformanceResult {
   findings: SecurityFinding[];
 }
 
-// Pentest specific types (all passive reconnaissance only)
+// Pentest Types
 export interface PortInfo {
   port: number;
   service: string;
@@ -67,66 +127,12 @@ export interface PentestResult {
   findings: SecurityFinding[];
 }
 
-export interface HeaderCheck {
-  name: string;
-  present: boolean;
-  value?: string;
-}
-
-export interface SSLInfo {
-  valid: boolean;
-  expired: boolean;
-  daysUntilExpiry: number;
-  issuer: string;
-  subject: string;
-  validFrom: string;
-  validTo: string;
-  cipherSuites?: string[];
-  tlsVersion?: string;
-  weakCipher?: boolean;
-}
-
-export interface DNSRecords {
-  spf: {
-    present: boolean;
-    records: string[];
-  };
-  dmarc: {
-    present: boolean;
-    records: string[];
-    policy?: string;
-  };
-  mx: {
-    present: boolean;
-    records: string[];
-  };
-  txt: string[];
-  ns: string[];
-  a: string[];
-}
-
-export interface HeadersInfo {
-  strictTransportSecurity?: string;
-  contentSecurityPolicy?: string;
-  xFrameOptions?: string;
-  xContentTypeOptions?: string;
-  xXssProtection?: string;
-  referrerPolicy?: string;
-  permissionsPolicy?: string;
-  cacheControl?: string;
-  etag?: string;
-  lastModified?: string;
-  server?: string;
-  xPoweredBy?: string;
-  via?: string;
-  allHeaders: Record<string, string>;
-}
-
+// Main Scan Result
 export interface ScanResult {
   mode: ScanMode;
   domain: string;
   score: number;
-  grade: SecurityGrade | PerformanceGrade | PentestGrade;
+  grade: Grade;
   findings: SecurityFinding[];
   headers: HeadersInfo;
   dns: DNSRecords;
@@ -145,4 +151,12 @@ export interface ScanRequest {
 export interface ScanError {
   error: string;
   code: string;
+}
+
+// Scanner Function Types
+export type ScannerFunction<T> = (domain: string) => Promise<T>;
+
+export interface BaseScanResult {
+  findings: SecurityFinding[];
+  score: number;
 }
