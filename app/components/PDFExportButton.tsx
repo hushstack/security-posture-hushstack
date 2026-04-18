@@ -219,55 +219,6 @@ export function PDFExportButton({ result }: PDFExportButtonProps) {
         });
       }
 
-      // AI Analysis Section
-      if (result.aiAnalysis) {
-        if (yPos > pageHeight - 60) {
-          doc.addPage();
-          yPos = margin;
-        }
-
-        yPos += 8;
-        
-        // Section header with accent
-        doc.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
-        doc.roundedRect(margin, yPos - 6, 3, 16, 1.5, 1.5, 'F');
-        addText('AI-Powered Analysis', margin + 8, yPos, { size: 12, bold: true });
-        yPos += 12;
-
-        // Summary box
-        doc.setDrawColor(colors.border[0], colors.border[1], colors.border[2]);
-        doc.setLineWidth(0.3);
-        doc.roundedRect(margin, yPos - 2, contentWidth, 1, 1, 1, 'F');
-        yPos += 6;
-
-        const summaryHeight = addText(result.aiAnalysis.aiSummary, margin, yPos, { size: 9, color: colors.dark, maxWidth: contentWidth, lineHeight: 1.5 });
-        yPos += summaryHeight + 10;
-
-        // Recommendations
-        if (result.aiAnalysis.recommendations && result.aiAnalysis.recommendations.length > 0) {
-          addText('Key Recommendations', margin, yPos, { size: 10, bold: true, color: colors.primary });
-          yPos += 10;
-
-          result.aiAnalysis.recommendations.slice(0, 4).forEach((rec) => {
-            if (yPos > pageHeight - 30) {
-              doc.addPage();
-              yPos = margin;
-            }
-
-            // Priority indicator
-            const priorityColor = rec.priority === 'high' ? colors.danger :
-                                 rec.priority === 'medium' ? colors.warning : colors.success;
-            doc.setFillColor(priorityColor[0], priorityColor[1], priorityColor[2]);
-            doc.roundedRect(margin, yPos, 2, 10, 1, 1, 'F');
-
-            addText(rec.title, margin + 6, yPos + 3, { size: 9, bold: true, maxWidth: contentWidth - 10 });
-            const descHeight = addText(rec.description, margin + 6, yPos + 10, { size: 8, color: colors.gray, maxWidth: contentWidth - 10 });
-            
-            yPos += descHeight + 12;
-          });
-        }
-      }
-
       // Footer on all pages
       const totalPages = doc.internal.pages.length - 1;
       for (let i = 1; i <= totalPages; i++) {
@@ -296,9 +247,9 @@ export function PDFExportButton({ result }: PDFExportButtonProps) {
     <motion.button
       onClick={generatePDF}
       disabled={isGenerating}
-      whileHover={{ scale: 1.03, y: -2 }}
-      whileTap={{ scale: 0.97 }}
-      className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-md hover:shadow-lg cursor-pointer disabled:opacity-50"
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
       style={{
         backgroundColor: '#6366f1',
         color: 'white',

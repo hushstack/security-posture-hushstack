@@ -1,4 +1,4 @@
-export type ScanMode = 'security' | 'performance' | 'pentest';
+export type ScanMode = 'security' | 'performance' | 'pentest' | 'audit';
 export type SecurityGrade = 'A' | 'B' | 'C' | 'D' | 'F';
 export type PerformanceGrade = 'A' | 'B' | 'C' | 'D' | 'F';
 export type PentestGrade = 'SECURE' | 'VULNERABLE' | 'CRITICAL';
@@ -122,39 +122,6 @@ export interface HeadersInfo {
   allHeaders: Record<string, string>;
 }
 
-export interface AIRecommendation {
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  title: string;
-  description: string;
-  implementation: string;
-  effort: 'low' | 'medium' | 'high';
-}
-
-export interface AIFinding {
-  id: string;
-  category: 'headers' | 'dns' | 'ssl' | 'general' | 'performance' | 'pentest' | 'vulnerability';
-  title: string;
-  description: string;
-  severity: FindingSeverity;
-  confidence: number;
-  evidence?: string[];
-  cwe?: string;
-  cvss?: number;
-}
-
-export interface AIAnalysis {
-  originalFindings: SecurityFinding[];
-  aiFindings: AIFinding[];
-  aiSummary: string;
-  recommendations: AIRecommendation[];
-  aiMetadata: {
-    modelUsed: string;
-    analysisDuration: number;
-    confidenceScore: number;
-    timestamp: string;
-  };
-}
-
 export interface ScanResult {
   mode: ScanMode;
   domain: string;
@@ -166,14 +133,61 @@ export interface ScanResult {
   ssl: SSLInfo | null;
   performance?: PerformanceResult;
   pentest?: PentestResult;
-  aiAnalysis?: AIAnalysis;
   scanTime: string;
   duration: number;
 }
 
+export interface ComprehensiveScanResult extends ScanResult {
+  securityScore: number;
+  performanceScore: number;
+  pentestScore: number;
+  auditScore: number;
+  auditReport?: {
+    targetUrl: string;
+    scanTimestamp: string;
+    riskScore: number;
+    riskLevel: string;
+    findings: Array<{
+      id: string;
+      category: string;
+      severity: string;
+      title: string;
+      description: string;
+      cvss: number;
+      cwe: string;
+      evidence: string;
+      recommendation: string;
+    }>;
+    sslAnalysis?: {
+      valid: boolean;
+      expired: boolean;
+      daysUntilExpiry: number;
+      tlsVersion: string;
+      weakProtocols: string[];
+      weakCiphers: string[];
+    };
+    headerAnalysis?: {
+      missingHeaders: string[];
+      weakHeaders: string[];
+      securityScore: number;
+    };
+    infoDisclosure?: {
+      htmlComments: string[];
+      exposedEmails: string[];
+      exposedIps: string[];
+      exposedPaths: string[];
+      versionNumbers: string[];
+    };
+    xssTests?: {
+      totalTests: number;
+      reflectedCount: number;
+      sanitizedCount: number;
+    };
+  };
+}
+
 export interface ScanRequest {
   domain: string;
-  mode: ScanMode;
 }
 
 export interface ScanError {
