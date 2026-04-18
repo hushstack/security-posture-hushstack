@@ -36,7 +36,22 @@
     "default": "Ralat tidak dijangka telah berlaku"
   },
   "footer": {
-    "disclaimer": "Alat ini hanya melakukan pencegahan pasif. Tiada muatan aktif SQLi XSS atau brute-forcing."
+    "disclaimer": "Alat ini hanya melakukan pencegahan pasif. Tiada muatan aktif SQLi XSS atau brute-forcing.",
+    "feedbackButton": "Hantar Maklum Balas",
+    "feedbackTitle": "Kami menghargai maklum balas anda"
+  },
+  "feedback": {
+    "name": "Nama Anda",
+    "email": "E-mel Anda",
+    "rating": "Nilai pengalaman anda",
+    "ratingRequired": "Sila pilih penarafan",
+    "message": "Mesej Anda",
+    "submit": "Hantar Maklum Balas",
+    "sending": "Menghantar...",
+    "cancel": "Batal",
+    "successTitle": "Terima Kasih!",
+    "successMessage": "Maklum balas anda telah dihantar. Semak e-mel anda untuk pengesahan.",
+    "error": "Gagal menghantar maklum balas. Sila cuba lagi."
   },
   "onboarding": {
     "step1": {
