@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { z } from 'zod';
+import { logger, logRequest, logError, logInfo } from '@/lib/logger';
 
 // Stricter email validation - rejects fake-looking emails
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -39,11 +40,17 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  const ip = request.headers.get('x-forwarded-for') || 'unknown';
+  
   try {
     const body = await request.json();
+    logRequest('POST', '/api/feedback', ip);
+    
     const result = feedbackSchema.safeParse(body);
 
     if (!result.success) {
+      logInfo('Feedback validation failed', { errors: result.error.flatten(), ip });
       return NextResponse.json(
         { error: 'Invalid input', details: result.error.flatten() },
         { status: 400 }
@@ -51,6 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { name, email, rating, message } = result.data;
+    logInfo('Processing feedback', { name, email, rating, ip });
     const adminEmail = process.env.ADMIN_EMAIL;
     const fromAddress = process.env.MAIL_FROM_ADDRESS;
     const fromName = process.env.MAIL_FROM_NAME;
@@ -122,9 +130,12 @@ export async function POST(request: NextRequest) {
       transporter.sendMail(userMailOptions),
     ]);
 
+    const duration = Date.now() - startTime;
+    logInfo('Feedback sent successfully', { name, email, duration: `${duration}ms` });
+    
     return NextResponse.json({ success: true, message: 'Feedback sent successfully' });
   } catch (error) {
-    console.error('Failed to send feedback email:', error);
+    logError(error as Error, { route: '/api/feedback', ip });
     return NextResponse.json(
       { error: 'Failed to send feedback' },
       { status: 500 }

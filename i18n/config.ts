@@ -12,12 +12,3 @@ export const localeNames: Record<Locale, string> = {
   ja: 'Japanese',
   zh: 'Chinese',
 };
-
-export const localeFlags: Record<Locale, string> = {
-  en: '🇺🇸',
-  km: '🇰🇭',
-  id: '🇮🇩',
-  ms: '🇲🇾',
-  ja: '🇯🇵',
-  zh: '🇨🇳',
-};

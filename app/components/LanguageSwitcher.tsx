@@ -4,7 +4,8 @@ import { useState, useEffect, useTransition } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { Locale, locales, localeNames, localeFlags } from '@/i18n/config';
+import { Locale, locales, localeNames } from '@/i18n/config';
+import { FlagIcons } from '@/components/FlagIcons';
 
 export function LanguageSwitcher() {
   const locale = useLocale();
@@ -54,7 +55,7 @@ export function LanguageSwitcher() {
         }`}
         disabled={isPending}
       >
-        <span className="text-lg">{localeFlags[locale as Locale]}</span>
+        <span className="text-lg">{FlagIcons[locale as Locale]}</span>
         <span className="text-sm font-medium">{localeNames[locale as Locale]}</span>
         <motion.svg
           xmlns="http://www.w3.org/2000/svg"
@@ -109,7 +110,7 @@ export function LanguageSwitcher() {
                           : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
                       }`}
                     >
-                      <span className="text-lg">{localeFlags[l]}</span>
+                      <span className="text-lg">{FlagIcons[l]}</span>
                       <span className="flex-1 text-left">{t(l)}</span>
                       {l === locale && (
                         <motion.svg
