@@ -1,0 +1,111 @@
+{
+  "metadata": {
+    "title": "セキュリティ態勢分析 | パッシブ偵察ツール",
+    "description": "パッシブ偵察によるドメインセキュリティ分析。HTTPヘッダー、SSL証明書、SPF、DMARC、DNSレコードを確認。100%合法で侵入しないスキャン。"
+  },
+  "home": {
+    "title": "セキュリティ態勢",
+    "subtitle": "偵察分析",
+    "description": "任意のドメインでパッシブセキュリティ偵察を実行。HTTPヘッダー、SSL証明書、DNSメールセキュリティを確認。",
+    "legalBadge": "100%合法で侵入しないスキャン"
+  },
+  "scanModes": {
+    "security": {
+      "label": "セキュリティスキャン",
+      "title": "HTTPヘッダー",
+      "description": "HSTS CSP X-Frame-Options"
+    },
+    "performance": {
+      "label": "パフォーマンス確認",
+      "title": "SSL/TLS",
+      "description": "証明書の有効性と有効期限"
+    },
+    "pentest": {
+      "label": "ペンテスト",
+      "title": "DNSセキュリティ",
+      "description": "SPFとDMARCレコード"
+    }
+  },
+  "searchForm": {
+    "placeholder": "ドメインを入力 (例: example.com)",
+    "scanButton": "スキャン",
+    "scanning": "スキャン中..."
+  },
+  "errors": {
+    "title": "エラー",
+    "default": "予期しないエラーが発生しました"
+  },
+  "footer": {
+    "disclaimer": "このツールはパッシブ偵察のみを実行します。アクティブなペイロード、SQLi、XSS、ブルートフォースは行いません。"
+  },
+  "onboarding": {
+    "step1": {
+      "title": "ようこそ! 👋",
+      "description": "このツールはパッシブ偵察によるドメインセキュリティを分析します。侵入しないスキャン - 100%合法!"
+    },
+    "step2": {
+      "title": "スキャンモードを選択",
+      "description": "セキュリティ、パフォーマンス、またはペンテストを選択。"
+    },
+    "step3": {
+      "title": "ドメインを入力",
+      "description": "任意のドメイン (例: example.com) を入力し、スキャンをクリック。"
+    },
+    "step4": {
+      "title": "結果を表示",
+      "description": "セキュリティグレード、スコア、詳細な調査結果を確認。"
+    },
+    "buttons": {
+      "skip": "スキップ",
+      "back": "戻る",
+      "next": "次へ",
+      "finish": "完了"
+    },
+    "lookFor": "検索"
+  },
+  "language": {
+    "title": "言語",
+    "en": "英語",
+    "km": "クメール語",
+    "id": "インドネシア語",
+    "ms": "マレー語",
+    "ja": "日本語",
+    "zh": "中国語"
+  },
+  "results": {
+    "scannedIn": "スキャン時間",
+    "ms": "ミリ秒",
+    "passed": "合格",
+    "warnings": "警告",
+    "issues": "問題",
+    "sections": {
+      "ssl": "SSL/TLS証明書",
+      "headers": "HTTPセキュリティヘッダー",
+      "dns": "DNSメールセキュリティ",
+      "general": "その他の結果",
+      "performance": "パフォーマンス指標",
+      "pentest": "ペネトレーションテスト結果",
+      "vulnerability": "脆弱性"
+    },
+    "allFindings": "すべての結果",
+    "fix": "修正",
+    "viewRaw": "生スキャンデータを表示",
+    "scanAnother": "別のドメインをスキャン",
+    "severity": {
+      "good": "良好",
+      "warning": "警告",
+      "bad": "問題",
+      "critical": "重大",
+      "info": "情報"
+    },
+    "categories": {
+      "headers": "HTTPヘッダー",
+      "dns": "DNSレコード",
+      "ssl": "SSL/TLS",
+      "general": "一般",
+      "performance": "パフォーマンス",
+      "pentest": "ペネトレーションテスト",
+      "vulnerability": "脆弱性"
+    }
+  }
+}

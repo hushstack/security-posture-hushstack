@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useTranslations } from 'next-intl';
 
 interface SearchFormProps {
   onSubmit: (domain: string) => void;
@@ -32,6 +33,7 @@ function validateDomain(domain: string): string | null {
 }
 
 export function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
+  const t = useTranslations('searchForm');
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -43,12 +45,12 @@ export function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
     const domain = validateDomain(inputValue);
     
     if (!domain) {
-      setError('Please enter a valid domain (e.g., example.com)');
+      setError(t('placeholder'));
       return;
     }
 
     onSubmit(domain);
-  }, [inputValue, onSubmit]);
+  }, [inputValue, onSubmit, t]);
 
   return (
     <motion.form 
@@ -59,15 +61,18 @@ export function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
       transition={{ delay: 0.3, duration: 0.5 }}
     >
       <div className="relative group">
-        {/* Glow effect */}
+        {/* Glow effect on focus */}
         <motion.div
-          className="absolute -inset-1 rounded-2xl bg-linear-to-r from-zinc-600 to-zinc-500 opacity-0 blur-md transition-opacity duration-300"
-          animate={{ opacity: isFocused ? 0.3 : 0 }}
+          className="absolute -inset-1 rounded-2xl blur-md transition-opacity duration-300"
+          style={{ 
+            backgroundColor: 'var(--accent-primary)',
+            opacity: isFocused ? 0.15 : 0 
+          }}
         />
         
         <div className="relative flex items-center">
-          <div className="absolute left-5 text-zinc-500">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="absolute left-5" style={{ color: isFocused ? 'var(--accent-primary)' : 'var(--foreground-subtle)' }}>
+            <svg className="h-5 w-5 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
           </div>
@@ -81,17 +86,28 @@ export function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
             }}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            placeholder="Enter a domain (e.g., google.com)"
+            placeholder={t('placeholder')}
             disabled={isLoading}
-            className="w-full rounded-2xl border border-zinc-700/50 bg-zinc-900/80 pl-14 pr-40 py-5 text-lg text-zinc-100 placeholder-zinc-500 backdrop-blur-xl transition-all focus:border-zinc-500 focus:outline-none focus:ring-0 disabled:opacity-50 shadow-xl shadow-black/20"
+            className="w-full rounded-2xl border pl-14 pr-36 sm:pr-40 py-5 text-lg transition-all focus:outline-none disabled:opacity-50"
+            style={{
+              backgroundColor: 'var(--background-elevated)',
+              borderColor: isFocused ? 'var(--accent-primary)' : 'var(--border-default)',
+              color: 'var(--foreground)',
+              boxShadow: isFocused ? '0 0 0 1px var(--accent-primary), 0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.2)'
+            }}
           />
           
           <motion.button
             type="submit"
             disabled={isLoading}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="absolute right-2 rounded-xl bg-zinc-100 px-8 py-3.5 font-semibold text-zinc-900 transition-all hover:bg-white hover:shadow-lg hover:shadow-zinc-100/25 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="absolute right-2 rounded-xl px-6 sm:px-8 py-3.5 font-semibold text-sm sm:text-base transition-all disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+            style={{
+              backgroundColor: 'var(--accent-primary)',
+              color: 'var(--background)',
+              boxShadow: '0 4px 15px var(--accent-primary)30'
+            }}
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
@@ -111,10 +127,11 @@ export function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                Scanning
+                <span className="hidden sm:inline">{t('scanning')}</span>
+                <span className="sm:hidden">...</span>
               </span>
             ) : (
-              'Scan'
+              t('scanButton')
             )}
           </motion.button>
         </div>
@@ -126,7 +143,8 @@ export function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="mt-3 text-sm text-red-400 flex items-center gap-2"
+            className="mt-3 text-sm flex items-center gap-2"
+            style={{ color: 'var(--accent-danger)' }}
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

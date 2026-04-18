@@ -1,0 +1,111 @@
+{
+  "metadata": {
+    "title": "Analisis Postur Keselamatan | Alat Pencegahan Pasif",
+    "description": "Analisis keselamatan domain dengan pencegahan pasif. Semak pengepala HTTP sijil SSL SPF DMARC dan rekod DNS. 100% sah pengimbasan tidak mengganggu."
+  },
+  "home": {
+    "title": "Postur Keselamatan",
+    "subtitle": "Analisis Pencegahan",
+    "description": "Lakukan pencegahan keselamatan pasif pada domain mana-mana. Semak pengepala HTTP sijil SSL dan keselamatan e-mel DNS.",
+    "legalBadge": "100% Sah Pengimbasan Tidak Mengganggu"
+  },
+  "scanModes": {
+    "security": {
+      "label": "Imbas Keselamatan",
+      "title": "Pengepala HTTP",
+      "description": "HSTS CSP X-Frame-Options"
+    },
+    "performance": {
+      "label": "Semak Prestasi",
+      "title": "SSL/TLS",
+      "description": "Kesahan sijil & tamat tempoh"
+    },
+    "pentest": {
+      "label": "Pentest",
+      "title": "Keselamatan DNS",
+      "description": "Rekod SPF & DMARC"
+    }
+  },
+  "searchForm": {
+    "placeholder": "Masukkan domain (cth. example.com)",
+    "scanButton": "Imbas",
+    "scanning": "Mengimbas..."
+  },
+  "errors": {
+    "title": "Ralat",
+    "default": "Ralat tidak dijangka telah berlaku"
+  },
+  "footer": {
+    "disclaimer": "Alat ini hanya melakukan pencegahan pasif. Tiada muatan aktif SQLi XSS atau brute-forcing."
+  },
+  "onboarding": {
+    "step1": {
+      "title": "Selamat Datang! 👋",
+      "description": "Alat ini menganalisis keselamatan domain dengan pencegahan pasif. Tiada pengimbasan yang mengganggu - 100% sah!"
+    },
+    "step2": {
+      "title": "Pilih Mode Imbas",
+      "description": "Pilih Keselamatan Prestasi atau Pentest."
+    },
+    "step3": {
+      "title": "Masukkan Domain",
+      "description": "Taip domain mana-mana (cth. example.com) dan klik Imbas."
+    },
+    "step4": {
+      "title": "Lihat Keputusan",
+      "description": "Lihat gred keselamatan skor dan penemuan terperinci."
+    },
+    "buttons": {
+      "skip": "Langkau",
+      "back": "Kembali",
+      "next": "Seterusnya",
+      "finish": "Selesai"
+    },
+    "lookFor": "Cari"
+  },
+  "language": {
+    "title": "Bahasa",
+    "en": "Inggeris",
+    "km": "Khmer",
+    "id": "Bahasa Indonesia",
+    "ms": "Melayu",
+    "ja": "Jepun",
+    "zh": "Cina"
+  },
+  "results": {
+    "scannedIn": "Diimbas dalam",
+    "ms": "ms",
+    "passed": "Lulus",
+    "warnings": "Amaran",
+    "issues": "Isu",
+    "sections": {
+      "ssl": "Sijil SSL/TLS",
+      "headers": "Pengepala Keselamatan HTTP",
+      "dns": "Keselamatan E-mel DNS",
+      "general": "Penemuan Lain",
+      "performance": "Metrik Prestasi",
+      "pentest": "Penemuan Ujian Penetrasi",
+      "vulnerability": "Kerentanan"
+    },
+    "allFindings": "Semua Penemuan",
+    "fix": "Baiki",
+    "viewRaw": "Lihat Data Imbasan Mentah",
+    "scanAnother": "Imbas Domain Lain",
+    "severity": {
+      "good": "Baik",
+      "warning": "Amaran",
+      "bad": "Isu",
+      "critical": "Kritikal",
+      "info": "Info"
+    },
+    "categories": {
+      "headers": "Pengepala HTTP",
+      "dns": "Rekod DNS",
+      "ssl": "SSL/TLS",
+      "general": "Umum",
+      "performance": "Prestasi",
+      "pentest": "Ujian Penetrasi",
+      "vulnerability": "Kerentanan"
+    }
+  }
+}

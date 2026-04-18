@@ -1,0 +1,111 @@
+{
+  "metadata": {
+    "title": "Analisis Postur Keamanan | Alat Rekognisi Pasif",
+    "description": "Analisis keamanan domain dengan rekognisi pasif. Periksa header HTTP sertifikat SSL SPF DMARC dan catatan DNS. 100% legal pemindaian tidak mengganggu."
+  },
+  "home": {
+    "title": "Postur Keamanan",
+    "subtitle": "Analisis Rekognisi",
+    "description": "Lakukan rekognisi keamanan pasif pada domain apa pun. Periksa header HTTP sertifikat SSL dan keamanan email DNS.",
+    "legalBadge": "100% Legal Pemindaian Tidak Mengganggu"
+  },
+  "scanModes": {
+    "security": {
+      "label": "Pindai Keamanan",
+      "title": "Header HTTP",
+      "description": "HSTS CSP X-Frame-Options"
+    },
+    "performance": {
+      "label": "Periksa Performa",
+      "title": "SSL/TLS",
+      "description": "Validitas sertifikat & kedaluwarsa"
+    },
+    "pentest": {
+      "label": "Pentest",
+      "title": "Keamanan DNS",
+      "description": "Catatan SPF & DMARC"
+    }
+  },
+  "searchForm": {
+    "placeholder": "Masukkan domain (mis. example.com)",
+    "scanButton": "Pindai",
+    "scanning": "Memindai..."
+  },
+  "errors": {
+    "title": "Kesalahan",
+    "default": "Terjadi kesalahan yang tidak terduga"
+  },
+  "footer": {
+    "disclaimer": "Alat ini hanya melakukan rekognisi pasif. Tidak ada payload aktif SQLi XSS atau brute-forcing."
+  },
+  "onboarding": {
+    "step1": {
+      "title": "Selamat Datang! 👋",
+      "description": "Alat ini menganalisis keamanan domain dengan rekognisi pasif. Tidak ada pemindaian yang mengganggu - 100% legal!"
+    },
+    "step2": {
+      "title": "Pilih Mode Pindai",
+      "description": "Pilih Keamanan Performa atau Pentest."
+    },
+    "step3": {
+      "title": "Masukkan Domain",
+      "description": "Ketik domain apa pun (mis. example.com) dan klik Pindai."
+    },
+    "step4": {
+      "title": "Lihat Hasil",
+      "description": "Lihat nilai keamanan skor dan temuan detail."
+    },
+    "buttons": {
+      "skip": "Lewati",
+      "back": "Kembali",
+      "next": "Berikutnya",
+      "finish": "Selesai"
+    },
+    "lookFor": "Cari"
+  },
+  "language": {
+    "title": "Bahasa",
+    "en": "Inggris",
+    "km": "Khmer",
+    "id": "Bahasa Indonesia",
+    "ms": "Melayu",
+    "ja": "Jepang",
+    "zh": "Mandarin"
+  },
+  "results": {
+    "scannedIn": "Dipindai dalam",
+    "ms": "md",
+    "passed": "Lulus",
+    "warnings": "Peringatan",
+    "issues": "Masalah",
+    "sections": {
+      "ssl": "Sertifikat SSL/TLS",
+      "headers": "Header Keamanan HTTP",
+      "dns": "Keamanan Email DNS",
+      "general": "Temuan Lainnya",
+      "performance": "Metrik Performa",
+      "pentest": "Temuan Tes Penetrasi",
+      "vulnerability": "Kerentanan"
+    },
+    "allFindings": "Semua Temuan",
+    "fix": "Perbaiki",
+    "viewRaw": "Lihat Data Pindaian Mentah",
+    "scanAnother": "Pindai Domain Lain",
+    "severity": {
+      "good": "Baik",
+      "warning": "Peringatan",
+      "bad": "Masalah",
+      "critical": "Kritis",
+      "info": "Info"
+    },
+    "categories": {
+      "headers": "Header HTTP",
+      "dns": "Catatan DNS",
+      "ssl": "SSL/TLS",
+      "general": "Umum",
+      "performance": "Performa",
+      "pentest": "Tes Penetrasi",
+      "vulnerability": "Kerentanan"
+    }
+  }
+}

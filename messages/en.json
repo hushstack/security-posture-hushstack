@@ -1,0 +1,111 @@
+{
+  "metadata": {
+    "title": "Security Posture Analyzer | Passive Reconnaissance Tool",
+    "description": "Analyze domain security with passive reconnaissance. Check HTTP headers, SSL certificates, SPF, DMARC, and DNS records. 100% legal, non-intrusive scanning."
+  },
+  "home": {
+    "title": "Security Posture",
+    "subtitle": "Reconnaissance Analyzer",
+    "description": "Perform passive security reconnaissance on any domain. Check HTTP headers, SSL certificates, and DNS email security.",
+    "legalBadge": "100% Legal, Non-Intrusive Scanning"
+  },
+  "scanModes": {
+    "security": {
+      "label": "Scan Security",
+      "title": "HTTP Headers",
+      "description": "HSTS, CSP, X-Frame-Options"
+    },
+    "performance": {
+      "label": "Check Performance",
+      "title": "SSL/TLS",
+      "description": "Certificate validity & expiry"
+    },
+    "pentest": {
+      "label": "Pentest",
+      "title": "DNS Security",
+      "description": "SPF & DMARC records"
+    }
+  },
+  "searchForm": {
+    "placeholder": "Enter domain (e.g., example.com)",
+    "scanButton": "Scan",
+    "scanning": "Scanning..."
+  },
+  "errors": {
+    "title": "Error",
+    "default": "An unexpected error occurred"
+  },
+  "footer": {
+    "disclaimer": "This tool performs passive reconnaissance only. No active payloads, SQLi, XSS, or brute-forcing."
+  },
+  "onboarding": {
+    "step1": {
+      "title": "Welcome! 👋",
+      "description": "This tool analyzes domain security with passive reconnaissance. No intrusive scanning - 100% legal!"
+    },
+    "step2": {
+      "title": "Choose Scan Mode",
+      "description": "Pick Security, Performance, or Pentest scan."
+    },
+    "step3": {
+      "title": "Enter Domain",
+      "description": "Type any domain (e.g., example.com) and click Scan."
+    },
+    "step4": {
+      "title": "View Results",
+      "description": "See your security grade, score, and detailed findings."
+    },
+    "buttons": {
+      "skip": "Skip",
+      "back": "Back",
+      "next": "Next",
+      "finish": "Finish"
+    },
+    "lookFor": "Look for"
+  },
+  "language": {
+    "title": "Language",
+    "en": "English",
+    "km": "Khmer",
+    "id": "Bahasa Indonesia",
+    "ms": "Malay",
+    "ja": "Japanese",
+    "zh": "Chinese"
+  },
+  "results": {
+    "scannedIn": "Scanned in",
+    "ms": "ms",
+    "passed": "Passed",
+    "warnings": "Warnings",
+    "issues": "Issues",
+    "sections": {
+      "ssl": "SSL/TLS Certificate",
+      "headers": "HTTP Security Headers",
+      "dns": "DNS Email Security",
+      "general": "Other Findings",
+      "performance": "Performance Metrics",
+      "pentest": "Penetration Test Findings",
+      "vulnerability": "Vulnerabilities"
+    },
+    "allFindings": "All Findings",
+    "fix": "Fix",
+    "viewRaw": "View Raw Scan Data",
+    "scanAnother": "Scan Another Domain",
+    "severity": {
+      "good": "Good",
+      "warning": "Warning",
+      "bad": "Issue",
+      "critical": "Critical",
+      "info": "Info"
+    },
+    "categories": {
+      "headers": "HTTP Headers",
+      "dns": "DNS Records",
+      "ssl": "SSL/TLS",
+      "general": "General",
+      "performance": "Performance",
+      "pentest": "Pentest",
+      "vulnerability": "Vulnerability"
+    }
+  }
+}

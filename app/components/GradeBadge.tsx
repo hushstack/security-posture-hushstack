@@ -9,15 +9,15 @@ interface GradeBadgeProps {
   score: number;
 }
 
-const gradeStyles: Record<string, string> = {
-  A: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  B: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  C: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  D: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-  F: 'bg-red-500/20 text-red-400 border-red-500/30',
-  SECURE: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  VULNERABLE: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-  CRITICAL: 'bg-red-500/20 text-red-400 border-red-500/30',
+const gradeStyles: Record<string, { bg: string; text: string; border: string }> = {
+  A: { bg: 'var(--accent-success)20', text: 'var(--accent-success)', border: 'var(--accent-success)40' },
+  B: { bg: 'var(--accent-primary)20', text: 'var(--accent-primary)', border: 'var(--accent-primary)40' },
+  C: { bg: 'var(--accent-warning)20', text: 'var(--accent-warning)', border: 'var(--accent-warning)40' },
+  D: { bg: 'var(--accent-warning)30', text: 'var(--accent-warning)', border: 'var(--accent-warning)50' },
+  F: { bg: 'var(--accent-danger)20', text: 'var(--accent-danger)', border: 'var(--accent-danger)40' },
+  SECURE: { bg: 'var(--accent-success)20', text: 'var(--accent-success)', border: 'var(--accent-success)40' },
+  VULNERABLE: { bg: 'var(--accent-warning)20', text: 'var(--accent-warning)', border: 'var(--accent-warning)40' },
+  CRITICAL: { bg: 'var(--accent-danger)20', text: 'var(--accent-danger)', border: 'var(--accent-danger)40' },
 };
 
 const gradeDescriptions: Record<string, string> = {
@@ -32,6 +32,8 @@ const gradeDescriptions: Record<string, string> = {
 };
 
 export const GradeBadge = memo(function GradeBadge({ grade, score }: GradeBadgeProps) {
+  const styles = gradeStyles[grade];
+  
   return (
     <div className="flex flex-col items-center">
       <motion.div
@@ -39,7 +41,13 @@ export const GradeBadge = memo(function GradeBadge({ grade, score }: GradeBadgeP
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
         whileHover={{ scale: 1.05 }}
-        className={`flex h-32 w-32 items-center justify-center rounded-2xl border-2 text-6xl font-bold ${gradeStyles[grade]} backdrop-blur-sm shadow-2xl`}
+        className="flex h-28 w-28 sm:h-32 sm:w-32 items-center justify-center rounded-2xl border-2 text-5xl sm:text-6xl font-bold backdrop-blur-sm shadow-2xl"
+        style={{
+          backgroundColor: styles?.bg || 'var(--background-elevated)',
+          color: styles?.text || 'var(--foreground)',
+          borderColor: styles?.border || 'var(--border-default)',
+          boxShadow: `0 8px 32px ${styles?.bg || 'transparent'}`
+        }}
       >
         {grade}
       </motion.div>
@@ -53,11 +61,14 @@ export const GradeBadge = memo(function GradeBadge({ grade, score }: GradeBadgeP
           initial={{ scale: 0.5 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
-          className="text-2xl font-semibold text-zinc-100"
+          className="text-2xl font-semibold"
+          style={{ color: 'var(--foreground)' }}
         >
           {score}/100
         </motion.p>
-        <p className="text-sm text-zinc-500 mt-1">{gradeDescriptions[grade]}</p>
+        <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>
+          {gradeDescriptions[grade]}
+        </p>
       </motion.div>
     </div>
   );

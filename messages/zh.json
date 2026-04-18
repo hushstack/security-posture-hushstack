@@ -1,0 +1,111 @@
+{
+  "metadata": {
+    "title": "安全态势分析 | 被动侦察工具",
+    "description": "通过被动侦察分析域名安全。检查HTTP头、SSL证书、SPF、DMARC和DNS记录。100%合法，无侵入性扫描。"
+  },
+  "home": {
+    "title": "安全态势",
+    "subtitle": "侦察分析器",
+    "description": "对任何域名执行被动安全侦察。检查HTTP头、SSL证书和DNS邮件安全。",
+    "legalBadge": "100%合法，无侵入性扫描"
+  },
+  "scanModes": {
+    "security": {
+      "label": "安全扫描",
+      "title": "HTTP头",
+      "description": "HSTS CSP X-Frame-Options"
+    },
+    "performance": {
+      "label": "检查性能",
+      "title": "SSL/TLS",
+      "description": "证书有效性和到期日"
+    },
+    "pentest": {
+      "label": "渗透测试",
+      "title": "DNS安全",
+      "description": "SPF和DMARC记录"
+    }
+  },
+  "searchForm": {
+    "placeholder": "输入域名（例如 example.com）",
+    "scanButton": "扫描",
+    "scanning": "扫描中..."
+  },
+  "errors": {
+    "title": "错误",
+    "default": "发生意外错误"
+  },
+  "footer": {
+    "disclaimer": "此工具仅执行被动侦察。没有主动载荷、SQLi、XSS或暴力破解。"
+  },
+  "onboarding": {
+    "step1": {
+      "title": "欢迎! 👋",
+      "description": "此工具通过被动侦察分析域名安全。无侵入性扫描 - 100%合法!"
+    },
+    "step2": {
+      "title": "选择扫描模式",
+      "description": "选择安全、性能或渗透测试。"
+    },
+    "step3": {
+      "title": "输入域名",
+      "description": "输入任何域名（例如 example.com）并点击扫描。"
+    },
+    "step4": {
+      "title": "查看结果",
+      "description": "查看安全等级、分数和详细发现。"
+    },
+    "buttons": {
+      "skip": "跳过",
+      "back": "返回",
+      "next": "下一步",
+      "finish": "完成"
+    },
+    "lookFor": "查找"
+  },
+  "language": {
+    "title": "语言",
+    "en": "英语",
+    "km": "高棉语",
+    "id": "印尼语",
+    "ms": "马来语",
+    "ja": "日语",
+    "zh": "中文"
+  },
+  "results": {
+    "scannedIn": "扫描用时",
+    "ms": "毫秒",
+    "passed": "通过",
+    "warnings": "警告",
+    "issues": "问题",
+    "sections": {
+      "ssl": "SSL/TLS 证书",
+      "headers": "HTTP 安全头部",
+      "dns": "DNS 邮件安全",
+      "general": "其他发现",
+      "performance": "性能指标",
+      "pentest": "渗透测试结果",
+      "vulnerability": "漏洞"
+    },
+    "allFindings": "所有发现",
+    "fix": "修复",
+    "viewRaw": "查看原始扫描数据",
+    "scanAnother": "扫描其他域名",
+    "severity": {
+      "good": "良好",
+      "warning": "警告",
+      "bad": "问题",
+      "critical": "严重",
+      "info": "信息"
+    },
+    "categories": {
+      "headers": "HTTP 头部",
+      "dns": "DNS 记录",
+      "ssl": "SSL/TLS",
+      "general": "一般",
+      "performance": "性能",
+      "pentest": "渗透测试",
+      "vulnerability": "漏洞"
+    }
+  }
+}
