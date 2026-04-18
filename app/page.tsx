@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SearchForm } from './components/SearchForm';
 import { ResultsDashboard } from './components/ResultsDashboard';
+import { OnboardingGuide } from './components/OnboardingGuide';
 import type { ScanResult, ScanMode } from './types/scan';
 
 const fadeInUp = {
@@ -78,6 +79,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 overflow-x-hidden">
+      {/* Onboarding Guide for first-time users */}
+      <OnboardingGuide />
+
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-linear-to-br from-zinc-950 via-zinc-900/30 to-zinc-950" />
@@ -134,6 +138,7 @@ export default function Home() {
               <motion.div 
                 variants={scaleIn}
                 className="text-center mb-12"
+                data-guide="logo"
               >
                 <motion.div 
                   className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-linear-to-br from-zinc-600 to-zinc-900 shadow-2xl shadow-zinc-900/50 ring-1 ring-zinc-700/50"
@@ -193,6 +198,7 @@ export default function Home() {
               <motion.div 
                 variants={fadeInUp}
                 className="w-full flex justify-center gap-3 mb-6"
+                data-guide="scan-modes"
               >
                 {[
                   { 
@@ -219,7 +225,7 @@ export default function Home() {
                     onClick={() => setScanMode(mode.id as ScanMode)}
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`relative px-5 py-3 rounded-xl font-medium text-sm transition-all flex items-center gap-2 border ${
+                    className={`relative px-5 py-3 rounded-xl font-medium text-sm transition-all flex items-center gap-2 border cursor-pointer ${
                       scanMode === mode.id
                         ? `bg-${mode.color}-500/20 border-${mode.color}-500/50 text-${mode.color}-400 shadow-lg shadow-${mode.color}-500/20`
                         : 'bg-zinc-900/50 border-zinc-700/50 text-zinc-400 hover:border-zinc-600 hover:text-zinc-300'
@@ -244,6 +250,7 @@ export default function Home() {
               <motion.div 
                 variants={fadeInUp}
                 className="w-full"
+                data-guide="search-form"
               >
                 <SearchForm onSubmit={handleScan} isLoading={isLoading} />
               </motion.div>
@@ -274,6 +281,7 @@ export default function Home() {
               <motion.div 
                 variants={fadeInUp}
                 className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-3 w-full"
+                data-guide="features"
               >
                 {[
                   {
