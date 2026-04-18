@@ -41,7 +41,22 @@
     "default": "An unexpected error occurred"
   },
   "footer": {
-    "disclaimer": "This tool performs passive reconnaissance only. No active payloads, SQLi, XSS, or brute-forcing."
+    "disclaimer": "This tool performs passive reconnaissance only. No active payloads, SQLi, XSS, or brute-forcing.",
+    "feedbackButton": "Send Feedback",
+    "feedbackTitle": "We value your feedback"
+  },
+  "feedback": {
+    "name": "Your Name",
+    "email": "Your Email",
+    "rating": "Rate your experience",
+    "ratingRequired": "Please select a rating",
+    "message": "Your Message",
+    "submit": "Send Feedback",
+    "sending": "Sending...",
+    "cancel": "Cancel",
+    "successTitle": "Thank You!",
+    "successMessage": "Your feedback has been sent. Check your email for confirmation.",
+    "error": "Failed to send feedback. Please try again."
   },
   "onboarding": {
     "step1": {

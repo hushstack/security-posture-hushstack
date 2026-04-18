@@ -36,7 +36,22 @@
     "default": "Terjadi kesalahan yang tidak terduga"
   },
   "footer": {
-    "disclaimer": "Alat ini hanya melakukan rekognisi pasif. Tidak ada payload aktif SQLi XSS atau brute-forcing."
+    "disclaimer": "Alat ini hanya melakukan rekognisi pasif. Tidak ada payload aktif SQLi XSS atau brute-forcing.",
+    "feedbackButton": "Kirim Umpan Balik",
+    "feedbackTitle": "Kami menghargai masukan Anda"
+  },
+  "feedback": {
+    "name": "Nama Anda",
+    "email": "Email Anda",
+    "rating": "Nilai pengalaman Anda",
+    "ratingRequired": "Silakan pilih penilaian",
+    "message": "Pesan Anda",
+    "submit": "Kirim Umpan Balik",
+    "sending": "Mengirim...",
+    "cancel": "Batal",
+    "successTitle": "Terima Kasih!",
+    "successMessage": "Umpan balik Anda telah dikirim. Periksa email Anda untuk konfirmasi.",
+    "error": "Gagal mengirim umpan balik. Silakan coba lagi."
   },
   "onboarding": {
     "step1": {

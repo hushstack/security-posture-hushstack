@@ -36,7 +36,22 @@
     "default": "予期しないエラーが発生しました"
   },
   "footer": {
-    "disclaimer": "このツールはパッシブ偵察のみを実行します。アクティブなペイロード、SQLi、XSS、ブルートフォースは行いません。"
+    "disclaimer": "このツールはパッシブ偵察のみを実行します。アクティブなペイロード、SQLi、XSS、ブルートフォースは行いません。",
+    "feedbackButton": "フィードバックを送信",
+    "feedbackTitle": "ご意見をお聞かせください"
+  },
+  "feedback": {
+    "name": "お名前",
+    "email": "メールアドレス",
+    "rating": "体験を評価する",
+    "ratingRequired": "評価を選択してください",
+    "message": "メッセージ",
+    "submit": "フィードバックを送信",
+    "sending": "送信中...",
+    "cancel": "キャンセル",
+    "successTitle": "ありがとうございます！",
+    "successMessage": "フィードバックが送信されました。確認メールをご確認ください。",
+    "error": "フィードバックの送信に失敗しました。もう一度お試しください。"
   },
   "onboarding": {
     "step1": {

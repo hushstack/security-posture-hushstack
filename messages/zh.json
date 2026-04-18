@@ -36,7 +36,22 @@
     "default": "发生意外错误"
   },
   "footer": {
-    "disclaimer": "此工具仅执行被动侦察。没有主动载荷、SQLi、XSS或暴力破解。"
+    "disclaimer": "此工具仅执行被动侦察。没有主动载荷、SQLi、XSS或暴力破解。",
+    "feedbackButton": "发送反馈",
+    "feedbackTitle": "我们重视您的反馈"
+  },
+  "feedback": {
+    "name": "您的姓名",
+    "email": "您的邮箱",
+    "rating": "评价您的体验",
+    "ratingRequired": "请选择评分",
+    "message": "您的留言",
+    "submit": "发送反馈",
+    "sending": "发送中...",
+    "cancel": "取消",
+    "successTitle": "谢谢！",
+    "successMessage": "您的反馈已发送。请查看邮箱确认邮件。",
+    "error": "发送反馈失败，请重试。"
   },
   "onboarding": {
     "step1": {
