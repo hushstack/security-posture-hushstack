@@ -10,6 +10,8 @@ export interface AIProviderConfig {
   model?: string;
   temperature?: number;
   maxTokens?: number;
+  maxRetries?: number;
+  retryDelay?: number;
 }
 
 export interface AIAnalysisRequest {

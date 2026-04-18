@@ -97,40 +97,52 @@ export class GeminiProvider extends BaseAIProvider {
   }
 
   private async callGeminiAPI(prompt: string): Promise<string> {
-    const url = `${this.baseUrl}/${this.model}:generateContent?key=${this.config.apiKey}`;
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: prompt }],
+    return this.withRetry(
+      async () => {
+        const url = `${this.baseUrl}/${this.model}:generateContent?key=${this.config.apiKey}`;
+        
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           },
-        ],
-        generationConfig: {
-          temperature: this.config.temperature ?? this.defaultTemperature,
-          maxOutputTokens: this.config.maxTokens ?? this.defaultMaxTokens,
-          responseMimeType: 'application/json',
-        },
-      }),
-    });
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [{ text: prompt }],
+              },
+            ],
+            generationConfig: {
+              temperature: this.config.temperature ?? this.defaultTemperature,
+              maxOutputTokens: this.config.maxTokens ?? this.defaultMaxTokens,
+              responseMimeType: 'application/json',
+            },
+          }),
+        });
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`${this.name} API error: ${response.status} - ${error}`);
-    }
+        if (!response.ok) {
+          const errorText = await response.text();
+          const error = new Error(`${this.name} API error: ${response.status} - ${errorText}`) as Error & { status?: number };
+          error.status = response.status;
+          throw error;
+        }
 
-    const data = await response.json() as GeminiResponse;
-    
-    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
-      throw new Error(`${this.name}: Empty response from API`);
-    }
+        const data = await response.json() as GeminiResponse;
+        
+        if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+          throw new Error(`${this.name}: Empty response from API`);
+        }
 
-    return data.candidates[0].content.parts[0].text;
+        return data.candidates[0].content.parts[0].text;
+      },
+      (error) => {
+        const status = (error as { status?: number })?.status;
+        // Retry on transient errors: 408 (Timeout), 429 (Rate Limit), 500 (Internal Error), 503 (Service Unavailable), 504 (Gateway Timeout)
+        return status === 408 || status === 429 || status === 500 || status === 503 || status === 504 || 
+               (error instanceof TypeError && error.message === 'Failed to fetch');
+      }
+    );
   }
 
   private buildPrompt(request: AIAnalysisRequest): string {
