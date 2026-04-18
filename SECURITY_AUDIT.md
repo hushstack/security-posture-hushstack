@@ -65,7 +65,34 @@ jobs:
 - [ ] Review security event logs
 - [ ] Update AI model versions quarterly
 
-### 5. Incident Response
+### 5. DNS Security Records (SPF & DMARC)
+
+These must be configured at your DNS provider (Cloudflare, Route53, etc.):
+
+### SPF Record (TXT)
+If you send email from your domain:
+```
+Type: TXT
+Name: @
+Value: v=spf1 include:_spf.google.com ~all
+```
+Replace `include:_spf.google.com` with your email provider's SPF include.
+
+### DMARC Record (TXT)
+```
+Type: TXT
+Name: _dmarc
+Value: v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com
+```
+
+- `p=none`: Monitor only (start here)
+- `p=quarantine`: Send to spam (after testing)
+- `p=reject`: Reject emails (highest protection)
+
+### DKIM Record
+Set up DKIM with your email provider (Google Workspace, SendGrid, etc.)
+
+## Incident Response
 
 If vulnerability found:
 1. Assess severity (CVSS score)
