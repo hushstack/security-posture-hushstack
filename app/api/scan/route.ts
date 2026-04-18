@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
     // Parse and validate request
     const body = await request.json();
-    const { domain: rawDomain, mode: rawMode = 'security' } = body;
+    const { domain: rawDomain, mode: rawMode = 'security', enableAI = false } = body;
 
     if (!rawDomain || typeof rawDomain !== 'string') {
       return NextResponse.json(
@@ -43,7 +43,14 @@ export async function POST(request: NextRequest) {
     const mode: ScanMode = validModes.includes(rawMode) ? rawMode : 'security';
 
     // Run scan using modular scanner
-    const result = await runScan(domain, { mode });
+    const result = await runScan(domain, {
+      mode,
+      ai: enableAI ? {
+        provider: 'gemini',
+        apiKey: process.env.GOOGLE_GEMINI_API_KEY!,
+        model: process.env.AI_MODEL || 'gemini-flash-latest',
+      } : undefined,
+    });
 
     return NextResponse.json(result);
 

@@ -1,21 +1,25 @@
 /**
  * Main Scanner Orchestrator
  * Coordinates all scanner modules and provides a unified API
+ * Optional AI-enhanced analysis via Gemini integration
  */
 
 import { checkHeaders, checkDNS, checkSSL, calculateSecurityScore } from './security';
 import { checkPerformance } from './performance';
 import { runPentestScan } from './pentest';
-import type { ScanResult, ScanMode, ScanRequest, SecurityFinding } from './types';
+import { createAI, type AIOptions, type AIEnhancedScanResult } from '@/lib/ai';
+import type { ScanResult, ScanMode, SecurityFinding } from './types';
 
 export * from './types';
 export { checkHeaders, checkDNS, checkSSL, calculateSecurityScore } from './security';
 export { checkPerformance } from './performance';
 export { runPentestScan } from './pentest';
+export type { AIEnhancedScanResult } from '@/lib/ai';
 
 export interface ScanOptions {
   mode: ScanMode;
   timeout?: number;
+  ai?: AIOptions;
 }
 
 function sortFindings(findings: SecurityFinding[]): SecurityFinding[] {
@@ -23,9 +27,16 @@ function sortFindings(findings: SecurityFinding[]): SecurityFinding[] {
   return findings.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
 }
 
-export async function runScan(domain: string, options: ScanOptions): Promise<ScanResult> {
+export interface ScanResultWithAI extends ScanResult {
+  aiAnalysis?: AIEnhancedScanResult;
+}
+
+export async function runScan(domain: string, options: ScanOptions): Promise<ScanResultWithAI> {
   const startTime = Date.now();
-  const { mode } = options;
+  const { mode, ai: aiOptions } = options;
+
+  // Initialize AI orchestrator if configured
+  const ai = aiOptions?.apiKey ? createAI(aiOptions) : null;
 
   // Run base checks for all modes
   const [headersResult, dnsResult, sslResult] = await Promise.allSettled([
@@ -49,8 +60,8 @@ export async function runScan(domain: string, options: ScanOptions): Promise<Sca
   switch (mode) {
     case 'performance': {
       const perf = await checkPerformance(domain);
-      return {
-        mode: 'performance',
+      const baseResult = {
+        mode: 'performance' as const,
         domain,
         score: perf.score,
         grade: perf.grade,
@@ -62,12 +73,14 @@ export async function runScan(domain: string, options: ScanOptions): Promise<Sca
         scanTime: new Date().toISOString(),
         duration: Date.now() - startTime,
       };
+      const aiAnalysis = await ai?.enhanceScan(baseResult, 'performance');
+      return aiAnalysis ? { ...baseResult, aiAnalysis } : baseResult;
     }
 
     case 'pentest': {
       const pentest = await runPentestScan(domain, headers, ssl);
-      return {
-        mode: 'pentest',
+      const baseResult = {
+        mode: 'pentest' as const,
         domain,
         score: pentest.score,
         grade: pentest.grade,
@@ -86,13 +99,15 @@ export async function runScan(domain: string, options: ScanOptions): Promise<Sca
         scanTime: new Date().toISOString(),
         duration: Date.now() - startTime,
       };
+      const aiAnalysis = await ai?.enhanceScan(baseResult, 'pentest');
+      return aiAnalysis ? { ...baseResult, aiAnalysis } : baseResult;
     }
 
     case 'security':
     default: {
       const { score, grade, findings } = calculateSecurityScore(headers, dns, ssl);
-      return {
-        mode: 'security',
+      const baseResult = {
+        mode: 'security' as const,
         domain,
         score,
         grade,
@@ -103,6 +118,8 @@ export async function runScan(domain: string, options: ScanOptions): Promise<Sca
         scanTime: new Date().toISOString(),
         duration: Date.now() - startTime,
       };
+      const aiAnalysis = await ai?.enhanceScan(baseResult, 'security');
+      return aiAnalysis ? { ...baseResult, aiAnalysis } : baseResult;
     }
   }
 }
