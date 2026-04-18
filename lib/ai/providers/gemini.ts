@@ -9,6 +9,7 @@ import {
   PERFORMANCE_SYSTEM_PROMPT,
   PENTEST_SYSTEM_PROMPT 
 } from '../prompts';
+import { securityLogger } from '@/lib/security/logger';
 import type {
   AIAnalysisRequest,
   AIAnalysisResponse,
@@ -44,20 +45,37 @@ export class GeminiProvider extends BaseAIProvider {
   async analyze(request: AIAnalysisRequest): Promise<AIAnalysisResponse> {
     const startTime = Date.now();
     
-    const prompt = this.buildPrompt(request);
-    const response = await this.callGeminiAPI(prompt);
+    // Log AI analysis start
+    securityLogger.aiAnalysisStarted(request.domain, this.model);
     
-    const analysis = this.parseJSONResponse<AIAnalysisResponse>(response);
-    
-    return {
-      ...analysis,
-      aiMetadata: {
-        modelUsed: this.model,
-        analysisDuration: Date.now() - startTime,
-        confidenceScore: this.calculateConfidence(analysis),
-        timestamp: new Date().toISOString(),
-      },
-    };
+    try {
+      const prompt = this.buildPrompt(request);
+      const response = await this.callGeminiAPI(prompt);
+      
+      const analysis = this.parseJSONResponse<AIAnalysisResponse>(response);
+      
+      const duration = Date.now() - startTime;
+      
+      // Log AI analysis completion
+      securityLogger.aiAnalysisCompleted(request.domain, this.model, duration);
+      
+      return {
+        ...analysis,
+        aiMetadata: {
+          modelUsed: this.model,
+          analysisDuration: duration,
+          confidenceScore: this.calculateConfidence(analysis),
+          timestamp: new Date().toISOString(),
+        },
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      // Log AI analysis failure
+      securityLogger.aiAnalysisFailed(request.domain, this.model, errorMessage);
+      
+      throw error;
+    }
   }
 
   async analyzeSecurity(
@@ -148,13 +166,21 @@ export class GeminiProvider extends BaseAIProvider {
   private buildPrompt(request: AIAnalysisRequest): string {
     const { scanMode, rawData, context, domain } = request;
     
+    // Sanitize raw data to prevent prompt injection and data leakage
+    const { data: sanitizedData, redactedFields } = this.sanitizeScanData(rawData);
+    
+    // Log if sensitive data was redacted
+    if (redactedFields.length > 0) {
+      securityLogger.sensitiveDataRedacted(domain, redactedFields);
+    }
+    
     return `${context}
 
 DOMAIN: ${domain}
 SCAN MODE: ${scanMode}
 
 RAW SCAN DATA:
-${JSON.stringify(rawData, null, 2)}
+${JSON.stringify(sanitizedData, null, 2)}
 
 TASK:
 Analyze the RAW SCAN DATA and provide findings in EXACT JSON format.
@@ -167,6 +193,104 @@ Focus on:
 2. Providing severity ratings (critical, bad, warning, info, good)
 3. Suggesting concrete remediation steps
 4. Assigning confidence scores (0-100) based on evidence clarity`;
+  }
+
+  /**
+   * Sanitizes scan data before sending to AI provider
+   * - Removes potential API keys, tokens, passwords
+   * - Limits data size to prevent prompt injection
+   * - Removes potentially malicious content
+   */
+  private sanitizeScanData(data: Record<string, unknown>): { data: Record<string, unknown>; redactedFields: string[] } {
+    const sensitivePatterns = [
+      /api[_-]?key/i,
+      /apikey/i,
+      /password/i,
+      /secret/i,
+      /token/i,
+      /auth/i,
+      /credential/i,
+      /private[_-]?key/i,
+      /access[_-]?key/i,
+      /bearer/i,
+    ];
+
+    const maxStringLength = 1000;
+    const maxArrayLength = 100;
+    const maxObjectKeys = 50;
+    const redactedFields: string[] = [];
+
+    const sanitize = (value: unknown, depth = 0, keyPath = ''): unknown => {
+      // Prevent deep nesting
+      if (depth > 5) {
+        return '[Max depth reached]';
+      }
+
+      if (typeof value === 'string') {
+        // Check for sensitive patterns
+        const lowerValue = value.toLowerCase();
+        for (const pattern of sensitivePatterns) {
+          if (pattern.test(lowerValue)) {
+            if (keyPath && !redactedFields.includes(keyPath)) {
+              redactedFields.push(keyPath);
+            }
+            return '[REDACTED]';
+          }
+        }
+        
+        // Limit string length
+        if (value.length > maxStringLength) {
+          return value.substring(0, maxStringLength) + '...[truncated]';
+        }
+        
+        // Remove potentially dangerous characters
+        return value
+          .replace(/[<>]/g, '') // Remove HTML tags
+          .replace(/\x00-\x08\x0b\x0c\x0e-\x1f/g, ''); // Remove control chars
+      }
+
+      if (typeof value === 'number' || typeof value === 'boolean') {
+        return value;
+      }
+
+      if (value === null || value === undefined) {
+        return value;
+      }
+
+      if (Array.isArray(value)) {
+        // Limit array length
+        const limitedArray = value.slice(0, maxArrayLength);
+        return limitedArray.map((item, index) => sanitize(item, depth + 1, `${keyPath}[${index}]`));
+      }
+
+      if (typeof value === 'object') {
+        const obj = value as Record<string, unknown>;
+        const keys = Object.keys(obj);
+        
+        // Limit object keys
+        if (keys.length > maxObjectKeys) {
+          return '[Object too large]';
+        }
+
+        const sanitized: Record<string, unknown> = {};
+        for (const key of keys) {
+          // Skip sensitive keys
+          const lowerKey = key.toLowerCase();
+          const currentPath = keyPath ? `${keyPath}.${key}` : key;
+          if (sensitivePatterns.some(p => p.test(lowerKey))) {
+            sanitized[key] = '[REDACTED]';
+            redactedFields.push(currentPath);
+          } else {
+            sanitized[key] = sanitize(obj[key], depth + 1, currentPath);
+          }
+        }
+        return sanitized;
+      }
+
+      return '[Unsupported type]';
+    };
+
+    return { data: sanitize(data, 0, '') as Record<string, unknown>, redactedFields };
   }
 
   private calculateConfidence(analysis: AIAnalysisResponse): number {
