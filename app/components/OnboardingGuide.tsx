@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useTranslations } from 'next-intl';
 
 interface Step {
   id: number;
@@ -11,38 +12,39 @@ interface Step {
   position: 'top' | 'bottom' | 'left' | 'right';
 }
 
-const steps: Step[] = [
+const getSteps = (t: (key: string) => string): Step[] => [
   {
     id: 1,
-    title: 'Welcome! 👋',
-    description: 'This tool analyzes domain security with passive reconnaissance. No intrusive scanning - 100% legal!',
+    title: t('step1.title'),
+    description: t('step1.description'),
     target: 'logo',
     position: 'bottom',
   },
   {
     id: 2,
-    title: 'Choose Scan Mode',
-    description: 'Pick Security, Performance, or Pentest scan.',
+    title: t('step2.title'),
+    description: t('step2.description'),
     target: 'scan-modes',
     position: 'bottom',
   },
   {
     id: 3,
-    title: 'Enter Domain',
-    description: 'Type any domain (e.g., example.com) and click Scan.',
+    title: t('step3.title'),
+    description: t('step3.description'),
     target: 'search-form',
     position: 'bottom',
   },
   {
     id: 4,
-    title: 'View Results',
-    description: 'See your security grade, score, and detailed findings.',
+    title: t('step4.title'),
+    description: t('step4.description'),
     target: 'features',
     position: 'top',
   },
 ];
 
 export function OnboardingGuide() {
+  const t = useTranslations('onboarding');
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [mounted, setMounted] = useState(false);
@@ -54,6 +56,8 @@ export function OnboardingGuide() {
       setIsOpen(true);
     }
   }, []);
+
+  const steps = getSteps(t);
 
   const handleClose = () => {
     setIsOpen(false);
@@ -79,6 +83,7 @@ export function OnboardingGuide() {
   };
 
   const currentStepData = steps[currentStep];
+  const totalSteps = steps.length;
 
   if (!mounted) return null;
 
@@ -99,11 +104,12 @@ export function OnboardingGuide() {
           <SpotlightTooltip
             step={currentStepData}
             currentStep={currentStep}
-            totalSteps={steps.length}
+            totalSteps={totalSteps}
             onNext={handleNext}
             onPrevious={handlePrevious}
             onSkip={handleSkip}
             onClose={handleClose}
+            t={t}
           />
         </>
       )}
@@ -119,6 +125,7 @@ interface SpotlightTooltipProps {
   onPrevious: () => void;
   onSkip: () => void;
   onClose: () => void;
+  t: (key: string) => string;
 }
 
 function SpotlightTooltip({
@@ -129,6 +136,7 @@ function SpotlightTooltip({
   onPrevious,
   onSkip,
   onClose,
+  t,
 }: SpotlightTooltipProps) {
   const [rect, setRect] = useState<DOMRect | null>(null);
 
@@ -299,6 +307,17 @@ function SpotlightTooltip({
             {step.description}
           </p>
 
+          {/* Look for indicator */}
+          <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-zinc-800/50 rounded-lg">
+            <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span className="text-xs text-zinc-400">
+              {t('lookFor')}: <span className="text-zinc-200 font-medium">{step.target.replace('-', ' ').toUpperCase()}</span>
+            </span>
+          </div>
+
           {/* Buttons */}
           <div className="flex gap-2">
             {currentStep > 0 ? (
@@ -306,21 +325,21 @@ function SpotlightTooltip({
                 onClick={onPrevious}
                 className="px-3 py-2 rounded-lg border border-zinc-700 text-zinc-400 text-sm hover:text-zinc-200 hover:border-zinc-600 transition-all cursor-pointer"
               >
-                Back
+                {t('buttons.back')}
               </button>
             ) : (
               <button
                 onClick={onSkip}
                 className="px-3 py-2 rounded-lg border border-zinc-700 text-zinc-400 text-sm hover:text-zinc-200 hover:border-zinc-600 transition-all cursor-pointer"
               >
-                Skip
+                {t('buttons.skip')}
               </button>
             )}
             <button
               onClick={onNext}
               className="flex-1 px-3 py-2 rounded-lg bg-emerald-500 text-zinc-950 text-sm font-semibold hover:bg-emerald-400 transition-all cursor-pointer"
             >
-              {currentStep === totalSteps - 1 ? 'Finish' : 'Next'}
+              {currentStep === totalSteps - 1 ? t('buttons.finish') : t('buttons.next')}
             </button>
           </div>
         </div>

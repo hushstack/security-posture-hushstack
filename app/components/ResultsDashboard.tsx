@@ -2,6 +2,7 @@
 
 import type { ScanResult, SecurityFinding } from '@/app/types/scan';
 import { motion } from 'motion/react';
+import { useTranslations } from 'next-intl';
 import { GradeBadge } from './GradeBadge';
 import { FindingCard } from './FindingCard';
 
@@ -48,6 +49,7 @@ const itemVariants = {
 };
 
 export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
+  const t = useTranslations('results');
   const groupedFindings = groupFindingsByCategory(result.findings);
   
   const goodFindings = result.findings.filter(f => f.severity === 'good');
@@ -67,9 +69,9 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
         className="flex flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-left rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-6 backdrop-blur-sm"
       >
         <div>
-          <h2 className="text-3xl font-bold text-zinc-100">{result.domain}</h2>
-          <p className="text-sm text-zinc-500 mt-1">
-            Scanned in {result.duration}ms • {new Date(result.scanTime).toLocaleString()}
+          <h2 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>{result.domain}</h2>
+          <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>
+            {t('scannedIn')} {result.duration}{t('ms')} • {new Date(result.scanTime).toLocaleString()}
           </p>
         </div>
         <GradeBadge grade={result.grade} score={result.score} />
@@ -79,24 +81,27 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
       <motion.div variants={itemVariants} className="grid grid-cols-3 gap-4">
         <motion.div 
           whileHover={{ scale: 1.02, y: -2 }}
-          className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5 text-center backdrop-blur-sm"
+          className="rounded-2xl border p-5 text-center backdrop-blur-sm"
+          style={{ borderColor: 'var(--accent-success)30', backgroundColor: 'var(--accent-success)10' }}
         >
-          <p className="text-3xl font-bold text-emerald-400">{goodFindings.length}</p>
-          <p className="text-sm text-zinc-400 mt-1">Passed</p>
+          <p className="text-3xl font-bold" style={{ color: 'var(--accent-success)' }}>{goodFindings.length}</p>
+          <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>{t('passed')}</p>
         </motion.div>
         <motion.div 
           whileHover={{ scale: 1.02, y: -2 }}
-          className="rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-5 text-center backdrop-blur-sm"
+          className="rounded-2xl border p-5 text-center backdrop-blur-sm"
+          style={{ borderColor: 'var(--accent-warning)30', backgroundColor: 'var(--accent-warning)10' }}
         >
-          <p className="text-3xl font-bold text-yellow-400">{warningFindings.length}</p>
-          <p className="text-sm text-zinc-400 mt-1">Warnings</p>
+          <p className="text-3xl font-bold" style={{ color: 'var(--accent-warning)' }}>{warningFindings.length}</p>
+          <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>{t('warnings')}</p>
         </motion.div>
         <motion.div 
           whileHover={{ scale: 1.02, y: -2 }}
-          className="rounded-2xl border border-red-500/20 bg-red-500/10 p-5 text-center backdrop-blur-sm"
+          className="rounded-2xl border p-5 text-center backdrop-blur-sm"
+          style={{ borderColor: 'var(--accent-danger)30', backgroundColor: 'var(--accent-danger)10' }}
         >
-          <p className="text-3xl font-bold text-red-400">{badFindings.length}</p>
-          <p className="text-sm text-zinc-400 mt-1">Issues</p>
+          <p className="text-3xl font-bold" style={{ color: 'var(--accent-danger)' }}>{badFindings.length}</p>
+          <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>{t('issues')}</p>
         </motion.div>
       </motion.div>
 
@@ -105,11 +110,11 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
         {/* SSL/TLS Section */}
         {groupedFindings.ssl.length > 0 && (
           <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold text-zinc-200 flex items-center gap-2">
-              <svg className="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <svg className="h-5 w-5" style={{ color: 'var(--accent-success)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
               </svg>
-              SSL/TLS Certificate
+              {t('sections.ssl')}
             </h3>
             <div className="space-y-3">
               {groupedFindings.ssl.map((finding, index) => (
@@ -129,11 +134,11 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
         {/* HTTP Headers Section */}
         {groupedFindings.headers.length > 0 && (
           <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold text-zinc-200 flex items-center gap-2">
-              <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <svg className="h-5 w-5" style={{ color: 'var(--accent-primary)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              HTTP Security Headers
+              {t('sections.headers')}
             </h3>
             <div className="space-y-3">
               {groupedFindings.headers.map((finding, index) => (
@@ -153,11 +158,11 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
         {/* DNS Records Section */}
         {groupedFindings.dns.length > 0 && (
           <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold text-zinc-200 flex items-center gap-2">
-              <svg className="h-5 w-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <svg className="h-5 w-5" style={{ color: 'var(--accent-purple)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
               </svg>
-              DNS Email Security
+              {t('sections.dns')}
             </h3>
             <div className="space-y-3">
               {groupedFindings.dns.map((finding, index) => (
@@ -177,11 +182,11 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
         {/* General Section */}
         {groupedFindings.general.length > 0 && (
           <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold text-zinc-200 flex items-center gap-2">
-              <svg className="h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <svg className="h-5 w-5" style={{ color: 'var(--foreground-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zM8.25 9.75h.008v.008H8.25V9.75zm0 3h.008v.008H8.25V12.75z" />
               </svg>
-              Other Findings
+              {t('sections.general')}
             </h3>
             <div className="space-y-3">
               {groupedFindings.general.map((finding, index) => (
@@ -201,11 +206,11 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
         {/* Performance Section */}
         {groupedFindings.performance.length > 0 && (
           <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold text-zinc-200 flex items-center gap-2">
-              <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <svg className="h-5 w-5" style={{ color: 'var(--accent-primary)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
               </svg>
-              Performance Metrics
+              {t('sections.performance')}
             </h3>
             <div className="space-y-3">
               {groupedFindings.performance.map((finding, index) => (
@@ -225,11 +230,11 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
         {/* Pentest Section */}
         {groupedFindings.pentest.length > 0 && (
           <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold text-zinc-200 flex items-center gap-2">
-              <svg className="h-5 w-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <svg className="h-5 w-5" style={{ color: 'var(--accent-purple)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.164 4.177l1.591-1.591M6 10.5H3.75m15.364 7.5l1.591 1.591M12 18V20.25" />
               </svg>
-              Penetration Test Findings
+              {t('sections.pentest')}
             </h3>
             <div className="space-y-3">
               {groupedFindings.pentest.map((finding, index) => (
@@ -249,11 +254,11 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
         {/* Vulnerability Section */}
         {groupedFindings.vulnerability.length > 0 && (
           <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold text-zinc-200 flex items-center gap-2">
-              <svg className="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <svg className="h-5 w-5" style={{ color: 'var(--accent-danger)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
               </svg>
-              Vulnerabilities
+              {t('sections.vulnerability')}
             </h3>
             <div className="space-y-3">
               {groupedFindings.vulnerability.map((finding, index) => (
@@ -272,12 +277,12 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
 
         {/* All Findings Summary */}
         {result.findings.length > 0 && (
-          <motion.div variants={itemVariants} className="rounded-2xl border border-zinc-800/50 bg-zinc-900/30 p-6">
-            <h3 className="mb-4 text-xl font-semibold text-zinc-200 flex items-center gap-2">
-              <svg className="h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <motion.div variants={itemVariants} className="rounded-2xl border p-6" style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--background-elevated)' }}>
+            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <svg className="h-5 w-5" style={{ color: 'var(--foreground-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-              All Findings ({result.findings.length})
+              {t('allFindings')} ({result.findings.length})
             </h3>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {result.findings.map((finding, index) => (
@@ -286,38 +291,44 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className={`p-3 rounded-lg border text-sm ${
-                    finding.severity === 'good' ? 'border-emerald-500/30 bg-emerald-500/10' :
-                    finding.severity === 'warning' ? 'border-yellow-500/30 bg-yellow-500/10' :
-                    finding.severity === 'bad' ? 'border-red-500/30 bg-red-500/10' :
-                    finding.severity === 'critical' ? 'border-red-600/50 bg-red-600/20' :
-                    'border-zinc-700/50 bg-zinc-800/50'
-                  }`}
+                  className="p-3 rounded-lg border text-sm"
+                  style={{
+                    borderColor: finding.severity === 'good' ? 'var(--accent-success)30' :
+                                 finding.severity === 'warning' ? 'var(--accent-warning)30' :
+                                 finding.severity === 'bad' ? 'var(--accent-danger)30' :
+                                 finding.severity === 'critical' ? 'var(--accent-danger)50' :
+                                 'var(--border-default)',
+                    backgroundColor: finding.severity === 'good' ? 'var(--accent-success)10' :
+                                      finding.severity === 'warning' ? 'var(--accent-warning)10' :
+                                      finding.severity === 'bad' ? 'var(--accent-danger)10' :
+                                      finding.severity === 'critical' ? 'var(--accent-danger)20' :
+                                      'var(--background-card)'
+                  }}
                 >
                   <div className="flex items-start gap-2">
-                    <span className={`font-medium ${
-                      finding.severity === 'good' ? 'text-emerald-400' :
-                      finding.severity === 'warning' ? 'text-yellow-400' :
-                      finding.severity === 'bad' ? 'text-red-400' :
-                      finding.severity === 'critical' ? 'text-red-400' :
-                      'text-zinc-400'
-                    }`}>
+                    <span className="font-medium" style={{
+                      color: finding.severity === 'good' ? 'var(--accent-success)' :
+                             finding.severity === 'warning' ? 'var(--accent-warning)' :
+                             finding.severity === 'bad' ? 'var(--accent-danger)' :
+                             finding.severity === 'critical' ? 'var(--accent-danger)' :
+                             'var(--foreground-muted)'
+                    }}>
                       {finding.severity === 'good' ? '✓' :
                        finding.severity === 'warning' ? '⚠' :
                        finding.severity === 'bad' ? '✗' :
                        finding.severity === 'critical' ? '!' : '•'}
                     </span>
                     <div className="flex-1">
-                      <p className="font-medium text-zinc-200">{finding.title}</p>
-                      <p className="text-zinc-400 text-xs mt-1">{finding.description}</p>
+                      <p className="font-medium" style={{ color: 'var(--foreground)' }}>{finding.title}</p>
+                      <p className="text-xs mt-1" style={{ color: 'var(--foreground-muted)' }}>{finding.description}</p>
                       {finding.details && (
-                        <p className="text-zinc-500 text-xs mt-1 font-mono">{finding.details}</p>
+                        <p className="text-xs mt-1 font-mono" style={{ color: 'var(--foreground-subtle)' }}>{finding.details}</p>
                       )}
                       {finding.recommendation && (
-                        <p className="text-emerald-400 text-xs mt-1">Fix: {finding.recommendation}</p>
+                        <p className="text-xs mt-1" style={{ color: 'var(--accent-success)' }}>{t('fix')}: {finding.recommendation}</p>
                       )}
                     </div>
-                    <span className="text-xs text-zinc-500 uppercase">{finding.category}</span>
+                    <span className="text-xs uppercase" style={{ color: 'var(--foreground-subtle)' }}>{t(`categories.${finding.category}`)}</span>
                   </div>
                 </motion.div>
               ))}
@@ -329,16 +340,17 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
       {/* Raw Data Toggle */}
       <motion.details 
         variants={itemVariants}
-        className="rounded-2xl border border-zinc-800/50 bg-zinc-900/30 overflow-hidden group"
+        className="rounded-2xl border overflow-hidden group"
+        style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--background-elevated)' }}
       >
-        <summary className="cursor-pointer p-4 text-sm font-medium text-zinc-400 hover:text-zinc-200 transition-colors flex items-center justify-between">
-          <span>View Raw Scan Data</span>
+        <summary className="cursor-pointer p-4 text-sm font-medium transition-colors flex items-center justify-between" style={{ color: 'var(--foreground-muted)' }}>
+          <span>{t('viewRaw')}</span>
           <svg className="h-4 w-4 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </summary>
-        <div className="border-t border-zinc-800/50 p-4">
-          <pre className="overflow-x-auto text-xs text-zinc-500 font-mono">
+        <div className="border-t p-4" style={{ borderColor: 'var(--border-default)' }}>
+          <pre className="overflow-x-auto text-xs font-mono" style={{ color: 'var(--foreground-subtle)' }}>
             {JSON.stringify(result, null, 2)}
           </pre>
         </div>
@@ -348,11 +360,16 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
       <motion.div variants={itemVariants} className="flex justify-center">
         <motion.button
           onClick={onReset}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="rounded-xl border border-zinc-700 bg-zinc-900/80 px-8 py-4 text-sm font-medium text-zinc-300 transition-all hover:border-zinc-500 hover:bg-zinc-800 hover:text-zinc-100 backdrop-blur-sm"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="rounded-xl border px-8 py-4 text-sm font-medium transition-all backdrop-blur-sm"
+          style={{ 
+            borderColor: 'var(--border-default)', 
+            backgroundColor: 'var(--background-elevated)',
+            color: 'var(--foreground-muted)'
+          }}
         >
-          Scan Another Domain
+          {t('scanAnother')}
         </motion.button>
       </motion.div>
     </motion.div>
