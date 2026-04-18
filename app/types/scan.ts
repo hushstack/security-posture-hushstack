@@ -122,6 +122,39 @@ export interface HeadersInfo {
   allHeaders: Record<string, string>;
 }
 
+export interface AIRecommendation {
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  title: string;
+  description: string;
+  implementation: string;
+  effort: 'low' | 'medium' | 'high';
+}
+
+export interface AIFinding {
+  id: string;
+  category: 'headers' | 'dns' | 'ssl' | 'general' | 'performance' | 'pentest' | 'vulnerability';
+  title: string;
+  description: string;
+  severity: FindingSeverity;
+  confidence: number;
+  evidence?: string[];
+  cwe?: string;
+  cvss?: number;
+}
+
+export interface AIAnalysis {
+  originalFindings: SecurityFinding[];
+  aiFindings: AIFinding[];
+  aiSummary: string;
+  recommendations: AIRecommendation[];
+  aiMetadata: {
+    modelUsed: string;
+    analysisDuration: number;
+    confidenceScore: number;
+    timestamp: string;
+  };
+}
+
 export interface ScanResult {
   mode: ScanMode;
   domain: string;
@@ -133,6 +166,7 @@ export interface ScanResult {
   ssl: SSLInfo | null;
   performance?: PerformanceResult;
   pentest?: PentestResult;
+  aiAnalysis?: AIAnalysis;
   scanTime: string;
   duration: number;
 }

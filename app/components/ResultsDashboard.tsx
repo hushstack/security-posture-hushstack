@@ -79,7 +79,7 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
 
       {/* Summary Stats */}
       <motion.div variants={itemVariants} className="grid grid-cols-3 gap-4">
-        <motion.div 
+        <motion.div
           whileHover={{ scale: 1.02, y: -2 }}
           className="rounded-2xl border p-5 text-center backdrop-blur-sm"
           style={{ borderColor: 'var(--accent-success)30', backgroundColor: 'var(--accent-success)10' }}
@@ -87,7 +87,7 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
           <p className="text-3xl font-bold" style={{ color: 'var(--accent-success)' }}>{goodFindings.length}</p>
           <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>{t('passed')}</p>
         </motion.div>
-        <motion.div 
+        <motion.div
           whileHover={{ scale: 1.02, y: -2 }}
           className="rounded-2xl border p-5 text-center backdrop-blur-sm"
           style={{ borderColor: 'var(--accent-warning)30', backgroundColor: 'var(--accent-warning)10' }}
@@ -95,7 +95,7 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
           <p className="text-3xl font-bold" style={{ color: 'var(--accent-warning)' }}>{warningFindings.length}</p>
           <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>{t('warnings')}</p>
         </motion.div>
-        <motion.div 
+        <motion.div
           whileHover={{ scale: 1.02, y: -2 }}
           className="rounded-2xl border p-5 text-center backdrop-blur-sm"
           style={{ borderColor: 'var(--accent-danger)30', backgroundColor: 'var(--accent-danger)10' }}
@@ -104,6 +104,139 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
           <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>{t('issues')}</p>
         </motion.div>
       </motion.div>
+
+      {/* AI Analysis Section */}
+      {result.aiAnalysis && (
+        <motion.div variants={itemVariants}>
+          {/* AI Summary */}
+          <div
+            className="rounded-2xl border p-6 mb-6 backdrop-blur-sm"
+            style={{ borderColor: 'rgba(99, 102, 241, 0.3)', backgroundColor: 'rgba(99, 102, 241, 0.05)' }}
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <svg className="h-5 w-5" style={{ color: '#6366f1' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423L16.5 16.5l.394 1.183a2.25 2.25 0 001.423 1.423L19.5 18.75l-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+              </svg>
+              <h3 className="text-xl font-semibold" style={{ color: '#6366f1' }}>AI Analysis</h3>
+              <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: 'rgba(99, 102, 241, 0.2)', color: '#6366f1' }}>
+                {result.aiAnalysis.aiMetadata.modelUsed}
+              </span>
+            </div>
+            <p className="text-base leading-relaxed" style={{ color: 'var(--foreground)' }}>
+              {result.aiAnalysis.aiSummary}
+            </p>
+            <div className="mt-4 flex items-center gap-4 text-sm" style={{ color: 'var(--foreground-muted)' }}>
+              <span>Confidence: {result.aiAnalysis.aiMetadata.confidenceScore}%</span>
+              <span>•</span>
+              <span>Analysis time: {result.aiAnalysis.aiMetadata.analysisDuration}ms</span>
+            </div>
+          </div>
+
+          {/* AI Recommendations */}
+          {result.aiAnalysis.recommendations.length > 0 && (
+            <div className="rounded-2xl border p-6 mb-6 backdrop-blur-sm" style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--background-elevated)' }}>
+              <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--foreground)' }}>AI Recommendations</h4>
+              <div className="space-y-3">
+                {result.aiAnalysis.recommendations.map((rec, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="p-4 rounded-xl border"
+                    style={{
+                      borderColor: rec.priority === 'critical' ? 'var(--accent-danger)40' :
+                                   rec.priority === 'high' ? 'var(--accent-warning)40' :
+                                   'var(--border-default)',
+                      backgroundColor: rec.priority === 'critical' ? 'var(--accent-danger)10' :
+                                        rec.priority === 'high' ? 'var(--accent-warning)10' :
+                                        'var(--background-card)'
+                    }}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <span className="font-medium" style={{ color: 'var(--foreground)' }}>{rec.title}</span>
+                      <span className="text-xs px-2 py-1 rounded-full font-medium"
+                        style={{
+                          backgroundColor: rec.priority === 'critical' ? 'var(--accent-danger)20' :
+                                          rec.priority === 'high' ? 'var(--accent-warning)20' :
+                                          'var(--foreground-muted)20',
+                          color: rec.priority === 'critical' ? 'var(--accent-danger)' :
+                                 rec.priority === 'high' ? 'var(--accent-warning)' :
+                                 'var(--foreground-muted)'
+                        }}
+                      >
+                        {rec.priority}
+                      </span>
+                    </div>
+                    <p className="text-sm mb-2" style={{ color: 'var(--foreground-muted)' }}>{rec.description}</p>
+                    <p className="text-xs font-mono" style={{ color: 'var(--foreground-subtle)' }}>
+                      Implementation: {rec.implementation} ({rec.effort} effort)
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* AI Findings */}
+          {result.aiAnalysis.aiFindings.length > 0 && (
+            <div className="rounded-2xl border p-6 backdrop-blur-sm" style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--background-elevated)' }}>
+              <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--foreground)' }}>AI Findings</h4>
+              <div className="space-y-2">
+                {result.aiAnalysis.aiFindings.map((finding, index) => (
+                  <motion.div
+                    key={finding.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="p-3 rounded-lg border text-sm"
+                    style={{
+                      borderColor: finding.severity === 'critical' ? 'var(--accent-danger)50' :
+                                   finding.severity === 'bad' ? 'var(--accent-danger)30' :
+                                   finding.severity === 'warning' ? 'var(--accent-warning)30' :
+                                   'var(--border-default)',
+                      backgroundColor: finding.severity === 'critical' ? 'var(--accent-danger)15' :
+                                      finding.severity === 'bad' ? 'var(--accent-danger)10' :
+                                      finding.severity === 'warning' ? 'var(--accent-warning)10' :
+                                      'var(--background-card)'
+                    }}
+                  >
+                    <div className="flex items-start gap-2">
+                      <span className="font-medium" style={{
+                        color: finding.severity === 'critical' ? 'var(--accent-danger)' :
+                               finding.severity === 'bad' ? 'var(--accent-danger)' :
+                               finding.severity === 'warning' ? 'var(--accent-warning)' :
+                               'var(--foreground-muted)'
+                      }}>
+                        {finding.severity === 'critical' ? '!' :
+                         finding.severity === 'bad' ? '✗' :
+                         finding.severity === 'warning' ? '⚠' : '•'}
+                      </span>
+                      <div className="flex-1">
+                        <p className="font-medium" style={{ color: 'var(--foreground)' }}>{finding.title}</p>
+                        <p className="text-xs mt-1" style={{ color: 'var(--foreground-muted)' }}>{finding.description}</p>
+                        {finding.evidence && Array.isArray(finding.evidence) && finding.evidence.length > 0 && (
+                          <p className="text-xs mt-1 font-mono" style={{ color: 'var(--foreground-subtle)' }}>
+                            Evidence: {finding.evidence.join(', ')}
+                          </p>
+                        )}
+                        {finding.cwe && (
+                          <p className="text-xs mt-1" style={{ color: 'var(--accent-primary)' }}>
+                            {finding.cwe}
+                          </p>
+                        )}
+                      </div>
+                      <span className="text-xs" style={{ color: 'var(--foreground-subtle)' }}>
+                        {finding.confidence}% confidence
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          )}
+        </motion.div>
+      )}
 
       {/* Findings by Category */}
       <div className="space-y-6">

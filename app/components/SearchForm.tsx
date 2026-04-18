@@ -100,13 +100,14 @@ export function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
           <motion.button
             type="submit"
             disabled={isLoading}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="absolute right-2 rounded-xl px-6 sm:px-8 py-3.5 font-semibold text-sm sm:text-base transition-all disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+            whileHover={{ scale: 1.03, y: -1 }}
+            whileTap={{ scale: 0.97 }}
+            className="absolute right-2 rounded-xl px-6 sm:px-8 py-3.5 font-bold text-sm sm:text-base transition-all disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 border-2 cursor-pointer"
             style={{
               backgroundColor: 'var(--accent-primary)',
-              color: 'var(--background)',
-              boxShadow: '0 4px 15px var(--accent-primary)30'
+              color: 'white',
+              borderColor: 'var(--accent-primary)',
+              boxShadow: '0 4px 20px var(--accent-primary)50, inset 0 1px 0 rgba(255,255,255,0.2), 0 0 0 1px rgba(0,0,0,0.1)'
             }}
           >
             {isLoading ? (
