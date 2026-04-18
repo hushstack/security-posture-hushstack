@@ -281,15 +281,14 @@ function SpotlightTooltip({
           {/* Progress dots */}
           <div className="flex gap-1.5 mb-3">
             {Array.from({ length: totalSteps }).map((_, index) => (
-              <div
+              <button
                 key={index}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  index === currentStep
-                    ? 'w-6 bg-emerald-500'
-                    : index < currentStep
-                    ? 'w-1.5 bg-emerald-500/50'
-                    : 'w-1.5 bg-zinc-700'
-                }`}
+                onClick={onNext}
+                className="text-sm font-medium px-4 py-2 rounded-lg transition-all cursor-pointer"
+                style={{
+                  backgroundColor: index === currentStep ? 'var(--accent-primary)' : 'var(--accent-secondary)',
+                  color: index === currentStep ? 'white' : 'var(--text-primary)',
+                }}
               />
             ))}
           </div>

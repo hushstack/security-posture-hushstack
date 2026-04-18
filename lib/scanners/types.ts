@@ -3,7 +3,7 @@
  * Centralized type definitions for maintainability
  */
 
-export type ScanMode = 'security' | 'performance' | 'pentest';
+export type ScanMode = 'security' | 'performance' | 'pentest' | 'audit';
 
 export type SecurityGrade = 'A' | 'B' | 'C' | 'D' | 'F';
 export type PerformanceGrade = 'A' | 'B' | 'C' | 'D' | 'F';
@@ -109,7 +109,7 @@ export interface TechnologyStack {
   name: string;
   version?: string;
   confidence: number;
-  category: 'web-server' | 'framework' | 'language' | 'database' | 'cdn' | 'analytics';
+  category: 'web-server' | 'framework' | 'language' | 'database' | 'cdn' | 'analytics' | 'cms' | 'infrastructure';
 }
 
 export interface SubdomainInfo {

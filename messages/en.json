@@ -24,6 +24,11 @@
       "label": "Pentest",
       "title": "DNS Security",
       "description": "SPF & DMARC records"
+    },
+    "audit": {
+      "label": "Deep Audit",
+      "title": "Full Security Audit",
+      "description": "SSL, Headers, XSS & Info Disclosure"
     }
   },
   "searchForm": {

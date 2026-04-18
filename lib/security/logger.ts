@@ -9,11 +9,7 @@ export enum SecurityEventType {
   SCAN_FAILED = 'SCAN_FAILED',
   RATE_LIMIT_HIT = 'RATE_LIMIT_HIT',
   INVALID_DOMAIN = 'INVALID_DOMAIN',
-  AI_ANALYSIS_STARTED = 'AI_ANALYSIS_STARTED',
-  AI_ANALYSIS_COMPLETED = 'AI_ANALYSIS_COMPLETED',
-  AI_ANALYSIS_FAILED = 'AI_ANALYSIS_FAILED',
   SENSITIVE_DATA_REDACTED = 'SENSITIVE_DATA_REDACTED',
-  PROMPT_INJECTION_ATTEMPT = 'PROMPT_INJECTION_ATTEMPT',
 }
 
 interface SecurityEvent {
@@ -111,33 +107,6 @@ class SecurityLogger {
     });
   }
 
-  aiAnalysisStarted(domain: string, model: string): void {
-    this.log({
-      type: SecurityEventType.AI_ANALYSIS_STARTED,
-      domain,
-      details: { model },
-      severity: 'info',
-    });
-  }
-
-  aiAnalysisCompleted(domain: string, model: string, duration: number): void {
-    this.log({
-      type: SecurityEventType.AI_ANALYSIS_COMPLETED,
-      domain,
-      details: { model, duration },
-      severity: 'info',
-    });
-  }
-
-  aiAnalysisFailed(domain: string, model: string, error: string): void {
-    this.log({
-      type: SecurityEventType.AI_ANALYSIS_FAILED,
-      domain,
-      details: { model, error },
-      severity: 'error',
-    });
-  }
-
   sensitiveDataRedacted(domain: string, fields: string[]): void {
     this.log({
       type: SecurityEventType.SENSITIVE_DATA_REDACTED,
@@ -147,15 +116,6 @@ class SecurityLogger {
     });
   }
 
-  promptInjectionAttempt(ip: string, domain: string, pattern: string): void {
-    this.log({
-      type: SecurityEventType.PROMPT_INJECTION_ATTEMPT,
-      ip,
-      domain,
-      details: { pattern },
-      severity: 'critical',
-    });
-  }
 }
 
 export const securityLogger = new SecurityLogger();

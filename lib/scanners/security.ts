@@ -220,18 +220,63 @@ export function calculateSecurityScore(
   let score = 100;
   const findings: SecurityFinding[] = [];
 
-  // Check security headers
+  // 1. Deep Security Header Analysis
   for (const [header, config] of Object.entries(SECURITY_HEADERS)) {
-    const headerValue = headers.allHeaders[header];
-    if (headerValue) {
+    const value = headers.allHeaders[header];
+    if (value) {
+      // Basic presence
       findings.push({
         id: `header-${header}`,
         category: 'headers',
         title: `${config.name} Present`,
         description: config.description,
         severity: 'good',
-        details: headerValue.substring(0, 100),
+        details: value.length > 100 ? value.substring(0, 100) + '...' : value,
       });
+
+      // Specific policy strength checks
+      if (header === 'strict-transport-security') {
+        const maxAgeMatch = value.match(/max-age=(\d+)/);
+        const maxAge = maxAgeMatch ? parseInt(maxAgeMatch[1]) : 0;
+        if (maxAge < 15768000) { // < 6 months
+          score -= 5;
+          findings.push({
+            id: 'hsts-weak',
+            category: 'headers',
+            title: 'Weak HSTS Policy',
+            description: 'The HSTS max-age is too short (recommended at least 6 months).',
+            severity: 'warning',
+            details: value
+          });
+        }
+        if (!value.includes('includeSubDomains')) {
+          score -= 2;
+          findings.push({
+            id: 'hsts-no-subdomains',
+            category: 'headers',
+            title: 'HSTS Subdomains Missing',
+            description: 'HSTS policy does not include subdomains.',
+            severity: 'info',
+            details: value
+          });
+        }
+      }
+
+      if (header === 'content-security-policy') {
+        const insecureDirectives = ["'unsafe-inline'", "'unsafe-eval'", "data:", "*"];
+        const foundInsecure = insecureDirectives.filter(d => value.includes(d));
+        if (foundInsecure.length > 0) {
+          score -= 7;
+          findings.push({
+            id: 'csp-insecure',
+            category: 'headers',
+            title: 'Insecure CSP Directives',
+            description: `CSP contains insecure directives: ${foundInsecure.join(', ')}. This may allow XSS.`,
+            severity: 'warning',
+            details: value
+          });
+        }
+      }
     } else {
       score -= config.penalty;
       findings.push({
@@ -244,128 +289,171 @@ export function calculateSecurityScore(
     }
   }
 
-  // Server header fingerprinting (info disclosure)
-  if (headers.server) {
-    findings.push({
-      id: 'header-server',
-      category: 'headers',
-      title: 'Server Header Exposed',
-      description: `Server software identified: ${headers.server}`,
-      severity: 'warning',
-      details: headers.server,
-    });
-    score -= 2;
+  // Information Disclosure Headers
+  const disclosureHeaders = {
+    'server': { name: 'Server', penalty: 5 },
+    'x-powered-by': { name: 'X-Powered-By', penalty: 5 },
+    'x-aspnet-version': { name: 'X-AspNet-Version', penalty: 5 },
+    'via': { name: 'Via', penalty: 2 }
+  };
+
+  for (const [header, info] of Object.entries(disclosureHeaders)) {
+    const value = headers.allHeaders[header];
+    if (value) {
+      score -= info.penalty;
+      findings.push({
+        id: `disclosure-${header}`,
+        category: 'headers',
+        title: `${info.name} Header Exposed`,
+        description: `This header reveals technology stack details (${value}), which helps attackers fingerprint your server.`,
+        severity: 'warning',
+        details: value,
+      });
+    }
   }
 
-  if (headers.xPoweredBy) {
-    findings.push({
-      id: 'header-xpoweredby',
-      category: 'headers',
-      title: 'X-Powered-By Header Exposed',
-      description: `Technology stack identified: ${headers.xPoweredBy}`,
-      severity: 'warning',
-      details: headers.xPoweredBy,
-    });
-    score -= 2;
-  }
-
-  // DNS checks
+  // 2. Deep DNS Analysis
   if (dns.spf.present) {
+    const record = dns.spf.records[0] || '';
     findings.push({
       id: 'dns-spf',
       category: 'dns',
       title: 'SPF Record Configured',
       description: 'Sender Policy Framework helps prevent email spoofing.',
       severity: 'good',
-      details: dns.spf.records[0]?.substring(0, 100),
+      details: record,
     });
+
+    // Check for dangerous SPF configurations
+    if (record.includes('+all') || record.includes('?all')) {
+      score -= 10;
+      findings.push({
+        id: 'dns-spf-permissive',
+        category: 'dns',
+        title: 'Permissive SPF Policy',
+        description: 'Your SPF record uses "+all" or "?all", which effectively disables SPF protection.',
+        severity: 'critical',
+        details: record,
+      });
+    } else if (record.includes('~all')) {
+      findings.push({
+        id: 'dns-spf-softfail',
+        category: 'dns',
+        title: 'SPF SoftFail Policy',
+        description: 'Using "~all" is common but less secure than "-all" (HardFail).',
+        severity: 'info',
+        details: record,
+      });
+    }
   } else {
     score -= 10;
     findings.push({
-      id: 'dns-spf',
+      id: 'dns-spf-missing',
       category: 'dns',
       title: 'SPF Record Missing',
-      description: 'SPF records help prevent email spoofing and improve email deliverability.',
+      description: 'Without SPF, attackers can easily spoof emails from your domain.',
       severity: 'bad',
     });
   }
 
   if (dns.dmarc.present) {
-    const policyStrength = dns.dmarc.policy === 'reject' ? 'strong' : 
-                          dns.dmarc.policy === 'quarantine' ? 'moderate' : 'weak';
+    const record = dns.dmarc.records[0] || '';
+    const policy = dns.dmarc.policy || 'none';
+    
     findings.push({
       id: 'dns-dmarc',
       category: 'dns',
-      title: 'DMARC Record Configured',
-      description: `Domain-based Message Authentication with ${policyStrength} policy (${dns.dmarc.policy || 'none'}).`,
-      severity: dns.dmarc.policy === 'reject' ? 'good' : 'warning',
-      details: dns.dmarc.records[0]?.substring(0, 100),
+      title: `DMARC Policy: ${policy.toUpperCase()}`,
+      description: `DMARC is configured with a ${policy} policy.`,
+      severity: policy === 'reject' ? 'good' : policy === 'quarantine' ? 'warning' : 'bad',
+      details: record,
     });
     
-    if (dns.dmarc.policy === 'none') {
-      score -= 5;
+    if (policy === 'none') {
+      score -= 10;
+      findings.push({
+        id: 'dns-dmarc-weak',
+        category: 'dns',
+        title: 'DMARC Policy is "none"',
+        description: 'A policy of "none" only provides monitoring and does not stop spoofing attempts.',
+        severity: 'bad',
+      });
     }
   } else {
     score -= 15;
     findings.push({
-      id: 'dns-dmarc',
+      id: 'dns-dmarc-missing',
       category: 'dns',
       title: 'DMARC Record Missing',
-      description: 'DMARC builds on SPF to provide stronger email authentication.',
+      description: 'DMARC is essential for preventing sophisticated email phishing and spoofing.',
       severity: 'bad',
     });
   }
 
-  // SSL checks
+  // 3. SSL/TLS Rigorous Analysis
   if (ssl) {
     if (ssl.expired) {
-      score -= 25;
+      score -= 40;
       findings.push({
         id: 'ssl-expired',
         category: 'ssl',
         title: 'SSL Certificate Expired',
-        description: 'The SSL certificate has expired. Browsers will show security warnings.',
-        severity: 'bad',
-        details: `Expired on ${new Date(ssl.validTo).toLocaleDateString()}`,
-      });
-    } else if (ssl.daysUntilExpiry < 30) {
-      score -= 10;
-      findings.push({
-        id: 'ssl-expiring',
-        category: 'ssl',
-        title: 'SSL Certificate Expiring Soon',
-        description: 'The SSL certificate will expire within 30 days.',
-        severity: 'warning',
-        details: `Expires in ${ssl.daysUntilExpiry} days`,
+        description: 'Your certificate is expired. Connections are insecure.',
+        severity: 'critical',
+        details: `Expired on ${ssl.validTo}`,
       });
     } else {
-      findings.push({
-        id: 'ssl-valid',
-        category: 'ssl',
-        title: 'Valid SSL Certificate',
-        description: `SSL certificate is valid and expires in ${ssl.daysUntilExpiry} days.`,
-        severity: 'good',
-        details: `Issuer: ${ssl.issuer}`,
-      });
+      if (ssl.daysUntilExpiry < 15) {
+        score -= 15;
+        findings.push({
+          id: 'ssl-near-expiry',
+          category: 'ssl',
+          title: 'SSL Expiring Very Soon',
+          description: `The certificate expires in ${ssl.daysUntilExpiry} days. Renew immediately.`,
+          severity: 'bad',
+        });
+      }
+
+      // Protocol version checks
+      const tlsVer = ssl.tlsVersion;
+      if (tlsVer === 'TLSv1' || tlsVer === 'TLSv1.1') {
+        score -= 20;
+        findings.push({
+          id: 'ssl-old-tls',
+          category: 'ssl',
+          title: 'Obsolete TLS Version',
+          description: `Server uses ${tlsVer}, which is deprecated and contains vulnerabilities.`,
+          severity: 'critical',
+          details: tlsVer,
+        });
+      } else if (tlsVer === 'TLSv1.2') {
+        findings.push({
+          id: 'ssl-tls12',
+          category: 'ssl',
+          title: 'TLS 1.2 in Use',
+          description: 'TLS 1.2 is currently secure but TLS 1.3 is recommended.',
+          severity: 'good',
+        });
+      }
     }
 
     if (ssl.weakCipher) {
-      score -= 10;
+      score -= 15;
       findings.push({
         id: 'ssl-weak-cipher',
         category: 'ssl',
-        title: 'Weak Cipher Suite',
-        description: 'Server supports weak or deprecated cipher suites.',
-        severity: 'warning',
+        title: 'Weak Ciphers Supported',
+        description: 'Server supports deprecated ciphers like RC4, DES, or MD5.',
+        severity: 'critical',
       });
     }
   } else {
     score -= 30;
     findings.push({
-      id: 'ssl-missing',
+      id: 'ssl-failed',
       category: 'ssl',
-      title: 'SSL Certificate Issue',
-      description: 'Could not retrieve a valid SSL certificate.',
+      title: 'SSL Analysis Failed',
+      description: 'Could not establish a secure connection to verify certificate.',
       severity: 'bad',
     });
   }

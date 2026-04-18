@@ -3,8 +3,12 @@
 import type { ScanResult, SecurityFinding } from '@/app/types/scan';
 import { motion } from 'motion/react';
 import { useTranslations } from 'next-intl';
-import { GradeBadge } from './GradeBadge';
-import { FindingCard } from './FindingCard';
+import {
+  ResultsHeader,
+  StatsSummary,
+  FindingsSection,
+  AllFindingsList,
+} from '@/components/scan';
 import { PDFExportButton } from './PDFExportButton';
 
 interface ResultsDashboardProps {
@@ -34,447 +38,115 @@ function groupFindingsByCategory(findings: SecurityFinding[]) {
   return groups;
 }
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.05,
-    },
+// Section configurations for cleaner rendering
+const sections = [
+  {
+    key: 'ssl',
+    icon: 'M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z',
+    color: 'var(--accent-success)',
+    translationKey: 'sections.ssl',
   },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
+  {
+    key: 'headers',
+    icon: 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+    color: 'var(--accent-primary)',
+    translationKey: 'sections.headers',
+  },
+  {
+    key: 'dns',
+    icon: 'M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75',
+    color: 'var(--accent-purple)',
+    translationKey: 'sections.dns',
+  },
+  {
+    key: 'general',
+    icon: 'M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zM8.25 9.75h.008v.008H8.25V9.75zm0 3h.008v.008H8.25V12.75z',
+    color: 'var(--foreground-muted)',
+    translationKey: 'sections.general',
+  },
+  {
+    key: 'performance',
+    icon: 'M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z',
+    color: 'var(--accent-primary)',
+    translationKey: 'sections.performance',
+  },
+  {
+    key: 'pentest',
+    icon: 'M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.164 4.177l1.591-1.591M6 10.5H3.75m15.364 7.5l1.591 1.591M12 18V20.25',
+    color: 'var(--accent-purple)',
+    translationKey: 'sections.pentest',
+  },
+  {
+    key: 'vulnerability',
+    icon: 'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z',
+    color: 'var(--accent-danger)',
+    translationKey: 'sections.vulnerability',
+  },
+];
 
 export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
   const t = useTranslations('results');
   const groupedFindings = groupFindingsByCategory(result.findings);
-  
-  const goodFindings = result.findings.filter(f => f.severity === 'good');
-  const warningFindings = result.findings.filter(f => f.severity === 'warning');
-  const badFindings = result.findings.filter(f => f.severity === 'bad');
 
   return (
-    <motion.div 
-      className="w-full max-w-5xl space-y-8"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
+    <motion.div
+      className="w-full max-w-5xl space-y-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ staggerChildren: 0.05 }}
     >
+      {/* Sticky Top Bar with Action Buttons */}
+      <div className="sticky top-0 z-50 -mx-4 px-4 py-3 backdrop-blur-md" style={{ backgroundColor: 'rgba(var(--background-rgb), 0.8)' }}>
+        <div className="flex justify-between items-center max-w-5xl mx-auto">
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-semibold" style={{ color: 'var(--foreground-default)' }}>{result.domain}</span>
+            <span className="text-sm px-2 py-0.5 rounded" style={{ backgroundColor: 'var(--accent-primary)', color: 'white' }}>Grade {result.grade}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <PDFExportButton result={result} />
+            <motion.button
+              onClick={onReset}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="rounded-lg border px-4 py-2 text-sm font-medium transition-all cursor-pointer"
+              style={{
+                borderColor: 'var(--border-default)',
+                backgroundColor: 'var(--background-elevated)',
+                color: 'var(--foreground-muted)'
+              }}
+            >
+              ← New Scan
+            </motion.button>
+          </div>
+        </div>
+      </div>
+
       {/* Header */}
-      <motion.div 
-        variants={itemVariants}
-        className="flex flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-left card p-6"
-      >
-        <div>
-          <h2 className="text-2xl font-semibold" style={{ color: 'var(--foreground)' }}>{result.domain}</h2>
-          <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>
-            {t('scannedIn')} {result.duration}{t('ms')} • {new Date(result.scanTime).toLocaleString()}
-          </p>
-        </div>
-        <div className="flex flex-col items-center gap-3">
-          <PDFExportButton result={result} />
-          <GradeBadge grade={result.grade} score={result.score} />
-        </div>
-      </motion.div>
+      <ResultsHeader result={result} />
 
       {/* Summary Stats */}
-      <motion.div variants={itemVariants} className="grid grid-cols-3 gap-4">
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="card p-5 text-center"
-        >
-          <p className="text-3xl font-semibold" style={{ color: 'var(--accent-success)' }}>{goodFindings.length}</p>
-          <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>{t('passed')}</p>
-        </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="card p-5 text-center"
-        >
-          <p className="text-3xl font-semibold" style={{ color: 'var(--accent-warning)' }}>{warningFindings.length}</p>
-          <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>{t('warnings')}</p>
-        </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="card p-5 text-center"
-        >
-          <p className="text-3xl font-semibold" style={{ color: 'var(--accent-danger)' }}>{badFindings.length}</p>
-          <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>{t('issues')}</p>
-        </motion.div>
-      </motion.div>
-
-      {/* AI Analysis Section */}
-      {result.aiAnalysis && (
-        <motion.div variants={itemVariants}>
-          {/* AI Summary */}
-          <div
-            className="rounded-2xl border p-6 mb-6 backdrop-blur-sm"
-            style={{ borderColor: 'rgba(99, 102, 241, 0.3)', backgroundColor: 'rgba(99, 102, 241, 0.05)' }}
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <svg className="h-5 w-5" style={{ color: '#6366f1' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423L16.5 16.5l.394 1.183a2.25 2.25 0 001.423 1.423L19.5 18.75l-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
-              </svg>
-              <h3 className="text-xl font-semibold" style={{ color: '#6366f1' }}>AI Analysis</h3>
-              <span className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: 'rgba(99, 102, 241, 0.2)', color: '#6366f1' }}>
-                {result.aiAnalysis.aiMetadata.modelUsed}
-              </span>
-            </div>
-            <p className="text-base leading-relaxed" style={{ color: 'var(--foreground)' }}>
-              {result.aiAnalysis.aiSummary}
-            </p>
-            <div className="mt-4 flex items-center gap-4 text-sm" style={{ color: 'var(--foreground-muted)' }}>
-              <span>Confidence: {result.aiAnalysis.aiMetadata.confidenceScore}%</span>
-              <span>•</span>
-              <span>Analysis time: {result.aiAnalysis.aiMetadata.analysisDuration}ms</span>
-            </div>
-          </div>
-
-          {/* AI Recommendations */}
-          {result.aiAnalysis.recommendations.length > 0 && (
-            <div className="rounded-2xl border p-6 mb-6 backdrop-blur-sm" style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--background-elevated)' }}>
-              <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--foreground)' }}>AI Recommendations</h4>
-              <div className="space-y-3">
-                {result.aiAnalysis.recommendations.map((rec, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="p-4 rounded-xl border"
-                    style={{
-                      borderColor: rec.priority === 'critical' ? 'var(--accent-danger)40' :
-                                   rec.priority === 'high' ? 'var(--accent-warning)40' :
-                                   'var(--border-default)',
-                      backgroundColor: rec.priority === 'critical' ? 'var(--accent-danger)10' :
-                                        rec.priority === 'high' ? 'var(--accent-warning)10' :
-                                        'var(--background-card)'
-                    }}
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <span className="font-medium" style={{ color: 'var(--foreground)' }}>{rec.title}</span>
-                      <span className="text-xs px-2 py-1 rounded-full font-medium"
-                        style={{
-                          backgroundColor: rec.priority === 'critical' ? 'var(--accent-danger)20' :
-                                          rec.priority === 'high' ? 'var(--accent-warning)20' :
-                                          'var(--foreground-muted)20',
-                          color: rec.priority === 'critical' ? 'var(--accent-danger)' :
-                                 rec.priority === 'high' ? 'var(--accent-warning)' :
-                                 'var(--foreground-muted)'
-                        }}
-                      >
-                        {rec.priority}
-                      </span>
-                    </div>
-                    <p className="text-sm mb-2" style={{ color: 'var(--foreground-muted)' }}>{rec.description}</p>
-                    <p className="text-xs font-mono" style={{ color: 'var(--foreground-subtle)' }}>
-                      Implementation: {rec.implementation} ({rec.effort} effort)
-                    </p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* AI Findings */}
-          {result.aiAnalysis.aiFindings.length > 0 && (
-            <div className="rounded-2xl border p-6 backdrop-blur-sm" style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--background-elevated)' }}>
-              <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--foreground)' }}>AI Findings</h4>
-              <div className="space-y-2">
-                {result.aiAnalysis.aiFindings.map((finding, index) => (
-                  <motion.div
-                    key={finding.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="p-3 rounded-lg border text-sm"
-                    style={{
-                      borderColor: finding.severity === 'critical' ? 'var(--accent-danger)50' :
-                                   finding.severity === 'bad' ? 'var(--accent-danger)30' :
-                                   finding.severity === 'warning' ? 'var(--accent-warning)30' :
-                                   'var(--border-default)',
-                      backgroundColor: finding.severity === 'critical' ? 'var(--accent-danger)15' :
-                                      finding.severity === 'bad' ? 'var(--accent-danger)10' :
-                                      finding.severity === 'warning' ? 'var(--accent-warning)10' :
-                                      'var(--background-card)'
-                    }}
-                  >
-                    <div className="flex items-start gap-2">
-                      <span className="font-medium" style={{
-                        color: finding.severity === 'critical' ? 'var(--accent-danger)' :
-                               finding.severity === 'bad' ? 'var(--accent-danger)' :
-                               finding.severity === 'warning' ? 'var(--accent-warning)' :
-                               'var(--foreground-muted)'
-                      }}>
-                        {finding.severity === 'critical' ? '!' :
-                         finding.severity === 'bad' ? '✗' :
-                         finding.severity === 'warning' ? '⚠' : '•'}
-                      </span>
-                      <div className="flex-1">
-                        <p className="font-medium" style={{ color: 'var(--foreground)' }}>{finding.title}</p>
-                        <p className="text-xs mt-1" style={{ color: 'var(--foreground-muted)' }}>{finding.description}</p>
-                        {finding.evidence && Array.isArray(finding.evidence) && finding.evidence.length > 0 && (
-                          <p className="text-xs mt-1 font-mono" style={{ color: 'var(--foreground-subtle)' }}>
-                            Evidence: {finding.evidence.join(', ')}
-                          </p>
-                        )}
-                        {finding.cwe && (
-                          <p className="text-xs mt-1" style={{ color: 'var(--accent-primary)' }}>
-                            {finding.cwe}
-                          </p>
-                        )}
-                      </div>
-                      <span className="text-xs" style={{ color: 'var(--foreground-subtle)' }}>
-                        {finding.confidence}% confidence
-                      </span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          )}
-        </motion.div>
-      )}
+      <StatsSummary findings={result.findings} />
 
       {/* Findings by Category */}
       <div className="space-y-6">
-        {/* SSL/TLS Section */}
-        {groupedFindings.ssl.length > 0 && (
-          <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-              <svg className="h-5 w-5" style={{ color: 'var(--accent-success)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
-              {t('sections.ssl')}
-            </h3>
-            <div className="space-y-3">
-              {groupedFindings.ssl.map((finding, index) => (
-                <motion.div
-                  key={finding.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <FindingCard finding={finding} />
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* HTTP Headers Section */}
-        {groupedFindings.headers.length > 0 && (
-          <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-              <svg className="h-5 w-5" style={{ color: 'var(--accent-primary)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {t('sections.headers')}
-            </h3>
-            <div className="space-y-3">
-              {groupedFindings.headers.map((finding, index) => (
-                <motion.div
-                  key={finding.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <FindingCard finding={finding} />
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* DNS Records Section */}
-        {groupedFindings.dns.length > 0 && (
-          <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-              <svg className="h-5 w-5" style={{ color: 'var(--accent-purple)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-              </svg>
-              {t('sections.dns')}
-            </h3>
-            <div className="space-y-3">
-              {groupedFindings.dns.map((finding, index) => (
-                <motion.div
-                  key={finding.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <FindingCard finding={finding} />
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* General Section */}
-        {groupedFindings.general.length > 0 && (
-          <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-              <svg className="h-5 w-5" style={{ color: 'var(--foreground-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zM8.25 9.75h.008v.008H8.25V9.75zm0 3h.008v.008H8.25V12.75z" />
-              </svg>
-              {t('sections.general')}
-            </h3>
-            <div className="space-y-3">
-              {groupedFindings.general.map((finding, index) => (
-                <motion.div
-                  key={finding.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <FindingCard finding={finding} />
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Performance Section */}
-        {groupedFindings.performance.length > 0 && (
-          <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-              <svg className="h-5 w-5" style={{ color: 'var(--accent-primary)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-              </svg>
-              {t('sections.performance')}
-            </h3>
-            <div className="space-y-3">
-              {groupedFindings.performance.map((finding, index) => (
-                <motion.div
-                  key={finding.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <FindingCard finding={finding} />
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Pentest Section */}
-        {groupedFindings.pentest.length > 0 && (
-          <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-              <svg className="h-5 w-5" style={{ color: 'var(--accent-purple)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.164 4.177l1.591-1.591M6 10.5H3.75m15.364 7.5l1.591 1.591M12 18V20.25" />
-              </svg>
-              {t('sections.pentest')}
-            </h3>
-            <div className="space-y-3">
-              {groupedFindings.pentest.map((finding, index) => (
-                <motion.div
-                  key={finding.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <FindingCard finding={finding} />
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Vulnerability Section */}
-        {groupedFindings.vulnerability.length > 0 && (
-          <motion.div variants={itemVariants}>
-            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-              <svg className="h-5 w-5" style={{ color: 'var(--accent-danger)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-              </svg>
-              {t('sections.vulnerability')}
-            </h3>
-            <div className="space-y-3">
-              {groupedFindings.vulnerability.map((finding, index) => (
-                <motion.div
-                  key={finding.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <FindingCard finding={finding} />
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
+        {sections.map((section, index) => (
+          <FindingsSection
+            key={section.key}
+            title={t(section.translationKey)}
+            icon={section.icon}
+            iconColor={section.color}
+            findings={groupedFindings[section.key] || []}
+            delay={index * 0.1}
+          />
+        ))}
 
         {/* All Findings Summary */}
-        {result.findings.length > 0 && (
-          <motion.div variants={itemVariants} className="rounded-2xl border p-6" style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--background-elevated)' }}>
-            <h3 className="mb-4 text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-              <svg className="h-5 w-5" style={{ color: 'var(--foreground-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              {t('allFindings')} ({result.findings.length})
-            </h3>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              {result.findings.map((finding, index) => (
-                <motion.div
-                  key={`${finding.id}-${index}`}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="p-3 rounded-lg border text-sm"
-                  style={{
-                    borderColor: finding.severity === 'good' ? 'var(--accent-success)30' :
-                                 finding.severity === 'warning' ? 'var(--accent-warning)30' :
-                                 finding.severity === 'bad' ? 'var(--accent-danger)30' :
-                                 finding.severity === 'critical' ? 'var(--accent-danger)50' :
-                                 'var(--border-default)',
-                    backgroundColor: finding.severity === 'good' ? 'var(--accent-success)10' :
-                                      finding.severity === 'warning' ? 'var(--accent-warning)10' :
-                                      finding.severity === 'bad' ? 'var(--accent-danger)10' :
-                                      finding.severity === 'critical' ? 'var(--accent-danger)20' :
-                                      'var(--background-card)'
-                  }}
-                >
-                  <div className="flex items-start gap-2">
-                    <span className="font-medium" style={{
-                      color: finding.severity === 'good' ? 'var(--accent-success)' :
-                             finding.severity === 'warning' ? 'var(--accent-warning)' :
-                             finding.severity === 'bad' ? 'var(--accent-danger)' :
-                             finding.severity === 'critical' ? 'var(--accent-danger)' :
-                             'var(--foreground-muted)'
-                    }}>
-                      {finding.severity === 'good' ? '✓' :
-                       finding.severity === 'warning' ? '⚠' :
-                       finding.severity === 'bad' ? '✗' :
-                       finding.severity === 'critical' ? '!' : '•'}
-                    </span>
-                    <div className="flex-1">
-                      <p className="font-medium" style={{ color: 'var(--foreground)' }}>{finding.title}</p>
-                      <p className="text-xs mt-1" style={{ color: 'var(--foreground-muted)' }}>{finding.description}</p>
-                      {finding.details && (
-                        <p className="text-xs mt-1 font-mono" style={{ color: 'var(--foreground-subtle)' }}>{finding.details}</p>
-                      )}
-                      {finding.recommendation && (
-                        <p className="text-xs mt-1" style={{ color: 'var(--accent-success)' }}>{t('fix')}: {finding.recommendation}</p>
-                      )}
-                    </div>
-                    <span className="text-xs uppercase" style={{ color: 'var(--foreground-subtle)' }}>{t(`categories.${finding.category}`)}</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
+        <AllFindingsList findings={result.findings} />
       </div>
 
       {/* Raw Data Toggle */}
-      <motion.details 
-        variants={itemVariants}
-        className="rounded-2xl border overflow-hidden group"
+      <details
+        className="rounded-xl border overflow-hidden group"
         style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--background-elevated)' }}
       >
         <summary className="cursor-pointer p-4 text-sm font-medium transition-colors flex items-center justify-between" style={{ color: 'var(--foreground-muted)' }}>
@@ -488,17 +160,22 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
             {JSON.stringify(result, null, 2)}
           </pre>
         </div>
-      </motion.details>
+      </details>
 
       {/* Reset Button */}
-      <motion.div variants={itemVariants} className="flex justify-center">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="flex justify-center"
+      >
         <motion.button
           onClick={onReset}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="rounded-xl border px-8 py-4 text-sm font-medium transition-all backdrop-blur-sm"
-          style={{ 
-            borderColor: 'var(--border-default)', 
+          className="rounded-xl border px-8 py-4 text-sm font-medium transition-all backdrop-blur-sm cursor-pointer"
+          style={{
+            borderColor: 'var(--border-default)',
             backgroundColor: 'var(--background-elevated)',
             color: 'var(--foreground-muted)'
           }}
