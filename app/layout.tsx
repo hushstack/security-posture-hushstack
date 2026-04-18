@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { getMessages } from 'next-intl/server';
 import { NextIntlClientProvider } from 'next-intl';
+import { headers } from 'next/headers';
 import "./globals.css";
 import "../public/fonts/sn-kh-writhand.css";
 
@@ -36,13 +37,23 @@ export default async function RootLayout({
 }>) {
   const messages = await getMessages();
 
+  // Get nonce from proxy
+  const headersList = await headers();
+  const nonce = headersList.get('x-nonce') || undefined;
+
   return (
     <html
+      lang="en"
+      nonce={nonce}
+      suppressHydrationWarning
       className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
       data-scroll-behavior="smooth"
-      style={{ '--font-khmer': '"SN Kh Writhand", Battambang, sans-serif' } as React.CSSProperties}
     >
-      <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
+      <body
+        nonce={nonce}
+        suppressHydrationWarning
+        className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]"
+      >
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>
