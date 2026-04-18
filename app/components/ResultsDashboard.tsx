@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { useTranslations } from 'next-intl';
 import { GradeBadge } from './GradeBadge';
 import { FindingCard } from './FindingCard';
+import { PDFExportButton } from './PDFExportButton';
 
 interface ResultsDashboardProps {
   result: ScanResult;
@@ -66,41 +67,41 @@ export function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
       {/* Header */}
       <motion.div 
         variants={itemVariants}
-        className="flex flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-left rounded-2xl border border-zinc-800/50 bg-zinc-900/50 p-6 backdrop-blur-sm"
+        className="flex flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-left card p-6"
       >
         <div>
-          <h2 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>{result.domain}</h2>
+          <h2 className="text-2xl font-semibold" style={{ color: 'var(--foreground)' }}>{result.domain}</h2>
           <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>
             {t('scannedIn')} {result.duration}{t('ms')} • {new Date(result.scanTime).toLocaleString()}
           </p>
         </div>
-        <GradeBadge grade={result.grade} score={result.score} />
+        <div className="flex flex-col items-center gap-3">
+          <PDFExportButton result={result} />
+          <GradeBadge grade={result.grade} score={result.score} />
+        </div>
       </motion.div>
 
       {/* Summary Stats */}
       <motion.div variants={itemVariants} className="grid grid-cols-3 gap-4">
         <motion.div
-          whileHover={{ scale: 1.02, y: -2 }}
-          className="rounded-2xl border p-5 text-center backdrop-blur-sm"
-          style={{ borderColor: 'var(--accent-success)30', backgroundColor: 'var(--accent-success)10' }}
+          whileHover={{ scale: 1.02 }}
+          className="card p-5 text-center"
         >
-          <p className="text-3xl font-bold" style={{ color: 'var(--accent-success)' }}>{goodFindings.length}</p>
+          <p className="text-3xl font-semibold" style={{ color: 'var(--accent-success)' }}>{goodFindings.length}</p>
           <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>{t('passed')}</p>
         </motion.div>
         <motion.div
-          whileHover={{ scale: 1.02, y: -2 }}
-          className="rounded-2xl border p-5 text-center backdrop-blur-sm"
-          style={{ borderColor: 'var(--accent-warning)30', backgroundColor: 'var(--accent-warning)10' }}
+          whileHover={{ scale: 1.02 }}
+          className="card p-5 text-center"
         >
-          <p className="text-3xl font-bold" style={{ color: 'var(--accent-warning)' }}>{warningFindings.length}</p>
+          <p className="text-3xl font-semibold" style={{ color: 'var(--accent-warning)' }}>{warningFindings.length}</p>
           <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>{t('warnings')}</p>
         </motion.div>
         <motion.div
-          whileHover={{ scale: 1.02, y: -2 }}
-          className="rounded-2xl border p-5 text-center backdrop-blur-sm"
-          style={{ borderColor: 'var(--accent-danger)30', backgroundColor: 'var(--accent-danger)10' }}
+          whileHover={{ scale: 1.02 }}
+          className="card p-5 text-center"
         >
-          <p className="text-3xl font-bold" style={{ color: 'var(--accent-danger)' }}>{badFindings.length}</p>
+          <p className="text-3xl font-semibold" style={{ color: 'var(--accent-danger)' }}>{badFindings.length}</p>
           <p className="text-sm mt-1" style={{ color: 'var(--foreground-muted)' }}>{t('issues')}</p>
         </motion.div>
       </motion.div>

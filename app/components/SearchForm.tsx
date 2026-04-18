@@ -60,19 +60,10 @@ export function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3, duration: 0.5 }}
     >
-      <div className="relative group">
-        {/* Glow effect on focus */}
-        <motion.div
-          className="absolute -inset-1 rounded-2xl blur-md transition-opacity duration-300"
-          style={{ 
-            backgroundColor: 'var(--accent-primary)',
-            opacity: isFocused ? 0.15 : 0 
-          }}
-        />
-        
+      <div className="relative">
         <div className="relative flex items-center">
           <div className="absolute left-5" style={{ color: isFocused ? 'var(--accent-primary)' : 'var(--foreground-subtle)' }}>
-            <svg className="h-5 w-5 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="h-5 w-5 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
           </div>
@@ -88,26 +79,24 @@ export function SearchForm({ onSubmit, isLoading }: SearchFormProps) {
             onBlur={() => setIsFocused(false)}
             placeholder={t('placeholder')}
             disabled={isLoading}
-            className="w-full rounded-2xl border pl-14 pr-36 sm:pr-40 py-5 text-lg transition-all focus:outline-none disabled:opacity-50"
+            className="w-full rounded-xl border pl-14 pr-36 sm:pr-40 py-4 text-base transition-all focus:outline-none disabled:opacity-50"
             style={{
               backgroundColor: 'var(--background-elevated)',
               borderColor: isFocused ? 'var(--accent-primary)' : 'var(--border-default)',
               color: 'var(--foreground)',
-              boxShadow: isFocused ? '0 0 0 1px var(--accent-primary), 0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.2)'
+              boxShadow: isFocused ? '0 0 0 3px rgba(59, 130, 246, 0.1)' : 'none'
             }}
           />
           
           <motion.button
             type="submit"
             disabled={isLoading}
-            whileHover={{ scale: 1.03, y: -1 }}
-            whileTap={{ scale: 0.97 }}
-            className="absolute right-2 rounded-xl px-6 sm:px-8 py-3.5 font-bold text-sm sm:text-base transition-all disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 border-2 cursor-pointer"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="absolute right-2 rounded-lg px-6 sm:px-8 py-3 font-medium text-sm transition-all disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
             style={{
               backgroundColor: 'var(--accent-primary)',
               color: 'white',
-              borderColor: 'var(--accent-primary)',
-              boxShadow: '0 4px 20px var(--accent-primary)50, inset 0 1px 0 rgba(255,255,255,0.2), 0 0 0 1px rgba(0,0,0,0.1)'
             }}
           >
             {isLoading ? (
