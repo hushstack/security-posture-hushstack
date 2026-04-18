@@ -1,24 +1,51 @@
 @import "tailwindcss";
 
 :root {
-  /* Modern dark theme with subtle blue undertones */
-  --background: #0d1117;
-  --background-elevated: #161b22;
-  --background-card: #21262d;
-  --foreground: #f0f6fc;
-  --foreground-muted: #8b949e;
-  --foreground-subtle: #6e7681;
+  /* Clean Modern Dark Theme - Slate-based */
+  --background: #0f172a;
+  --background-elevated: #1e293b;
+  --background-card: #334155;
+  --foreground: #f8fafc;
+  --foreground-muted: #94a3b8;
+  --foreground-subtle: #64748b;
   
-  /* Accent colors */
-  --accent-primary: #58a6ff;
-  --accent-success: #3fb950;
-  --accent-warning: #d29922;
-  --accent-danger: #f85149;
-  --accent-purple: #a371f7;
+  /* Accent colors - Clean Blue System */
+  --accent-primary: #3b82f6;
+  --accent-primary-hover: #2563eb;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+  --accent-purple: #8b5cf6;
   
-  /* Border colors */
-  --border-default: #30363d;
-  --border-muted: #21262d;
+  /* Border & Divider */
+  --border-default: #334155;
+  --border-muted: #1e293b;
+  --divider: #475569;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+  
+  /* Spacing Scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
 }
 
 @theme inline {
@@ -35,12 +62,64 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-feature-settings: "ss01", "ss02", "cv01";
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
+  font-size: 16px;
+}
+
+/* Typography Scale */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+/* Component Base Styles */
+.card {
+  background: var(--background-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius-lg);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: var(--accent-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-secondary {
+  background: var(--background-card);
+  color: var(--foreground);
+  border: 1px solid var(--border-default);
+}
+
+.btn-secondary:hover {
+  background: var(--border-default);
+  border-color: var(--divider);
 }
 
 /* Custom scrollbar */

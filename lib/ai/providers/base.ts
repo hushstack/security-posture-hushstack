@@ -17,14 +17,51 @@ export abstract class BaseAIProvider implements AIProvider {
   protected config: AIProviderConfig;
   protected defaultTemperature = 0.3;
   protected defaultMaxTokens = 4096;
+  protected defaultMaxRetries = 3;
+  protected defaultRetryDelay = 1000;
 
   constructor(config: AIProviderConfig) {
     this.config = {
-      temperature: this.defaultTemperature,
-      maxTokens: this.defaultMaxTokens,
-      ...config,
+      temperature: config.temperature ?? this.defaultTemperature,
+      maxTokens: config.maxTokens ?? this.defaultMaxTokens,
+      maxRetries: config.maxRetries ?? this.defaultMaxRetries,
+      retryDelay: config.retryDelay ?? this.defaultRetryDelay,
+      apiKey: config.apiKey,
+      model: config.model,
     };
     this.validateConfig();
+  }
+
+  protected async withRetry<T>(
+    operation: () => Promise<T>,
+    shouldRetry: (error: unknown) => boolean = () => true
+  ): Promise<T> {
+    const maxRetries = this.config.maxRetries ?? this.defaultMaxRetries;
+    const baseDelay = this.config.retryDelay ?? this.defaultRetryDelay;
+    
+    let lastError: unknown;
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        lastError = error;
+        
+        if (attempt < maxRetries && shouldRetry(error)) {
+          const delay = Math.pow(2, attempt) * baseDelay;
+          console.warn(
+            `[${this.name}] Operation failed: ${error instanceof Error ? error.message : 'Unknown error'}. ` +
+            `Retrying in ${delay}ms... (Attempt ${attempt + 1}/${maxRetries})`
+          );
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        
+        break;
+      }
+    }
+    
+    throw lastError;
   }
 
   protected validateConfig(): void {
@@ -98,7 +135,7 @@ Respond in JSON format with:
         const extracted = sanitized.substring(firstBrace, lastBrace + 1);
         try {
           return JSON.parse(extracted) as T;
-        } catch (innerError) {
+        } catch {
           // Continue to throw the original error with more context
         }
       }

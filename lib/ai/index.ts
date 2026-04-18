@@ -5,15 +5,15 @@
  */
 
 import { GeminiProvider } from './providers/gemini';
-import type { AIProvider, AIEnhancedScanResult, AIAnalysisResponse } from './types';
+import type { AIProvider, AIEnhancedScanResult, AIAnalysisResponse, AIProviderConfig } from './types';
 import type { ScanMode, ScanResult, SecurityFinding } from '@/lib/scanners/types';
 
 // Provider registry for extensibility
-const providers = new Map<string, new (config: { apiKey: string; model?: string }) => AIProvider>();
+const providers = new Map<string, new (config: AIProviderConfig) => AIProvider>();
 
 export function registerProvider(
   name: string,
-  provider: new (config: { apiKey: string; model?: string }) => AIProvider
+  provider: new (config: AIProviderConfig) => AIProvider
 ): void {
   providers.set(name.toLowerCase(), provider);
 }
@@ -26,6 +26,8 @@ export interface AIOptions {
   apiKey?: string;
   model?: string;
   enabled?: boolean;
+  maxRetries?: number;
+  retryDelay?: number;
 }
 
 export class AIOrchestrator {
@@ -41,6 +43,8 @@ export class AIOrchestrator {
         this.provider = new ProviderClass({
           apiKey: options.apiKey,
           model: options.model,
+          maxRetries: options.maxRetries,
+          retryDelay: options.retryDelay,
         });
       }
     }
