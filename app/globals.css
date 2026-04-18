@@ -46,6 +46,9 @@
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
   --radius-full: 9999px;
+
+  /* Font Families */
+  --font-khmer: "SN Kh Writhand", Battambang, sans-serif;
 }
 
 @theme inline {
