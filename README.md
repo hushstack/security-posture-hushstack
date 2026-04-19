@@ -7,10 +7,13 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?logo=typescript)](https://typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?logo=tailwindcss)](https://tailwindcss.com)
 [![License](https://img.shields.io/badge/License-Private-red)]()
+[![Live Demo](https://img.shields.io/badge/Live_Demo-hushstackcambodia.site-10b981?logo=vercel)](https://web.test.hushstackcambodia.site/)
 
 Analyze domain security with comprehensive passive reconnaissance. Check HTTP headers, SSL/TLS certificates, DNS security records (SPF, DMARC, MX), performance metrics, and vulnerability indicators — all through **100% legal, non-intrusive scanning**.
 
-![Security Scan Demo](https://via.placeholder.com/800x400/0f172a/3b82f6?text=Security+Posture+Analyzer)
+**🌐 Live Demo: [https://web.test.hushstackcambodia.site/](https://web.test.hushstackcambodia.site/)**
+
+![Security Posture Analyzer Screenshot](./screenshot.png)
 
 ---
 
